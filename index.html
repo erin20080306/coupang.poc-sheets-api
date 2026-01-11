@@ -93,7 +93,7 @@
 
             <div class="gradient-card">
                 <div class="balance-header">
-                    <span>Total Balance</span>
+                    <span>總餘額</span>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                         <path d="M4 6L8 10L12 6" stroke="white" stroke-width="2" stroke-linecap="round"/>
                     </svg>
@@ -106,7 +106,7 @@
                                 <path d="M8 2L12 6" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"/>
                                 <path d="M4 10L8 14L12 10" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"/>
                             </svg>
-                            <span>Income</span>
+                            <span>收入</span>
                         </div>
                         <span class="income-amount" id="totalIncome">$2,350.00</span>
                     </div>
@@ -116,7 +116,7 @@
                                 <path d="M8 14L4 10" stroke="#EC4899" stroke-width="2" stroke-linecap="round"/>
                                 <path d="M12 6L8 2L4 6" stroke="#EC4899" stroke-width="2" stroke-linecap="round"/>
                             </svg>
-                            <span>Expenses</span>
+                            <span>支出</span>
                         </div>
                         <span class="expense-amount" id="totalExpenses">$950.00</span>
                     </div>
@@ -126,7 +126,7 @@
             <!-- Budget Progress -->
             <div class="budget-progress-card" id="budgetProgressCard" style="display: none;">
                 <div class="budget-header">
-                    <span>Monthly Budget</span>
+                    <span>每月預算</span>
                     <span class="budget-remaining" id="budgetRemaining">$1,050 remaining</span>
                 </div>
                 <div class="progress-bar">
@@ -159,7 +159,7 @@
                         <circle cx="12" cy="19" r="2" fill="#333"/>
                     </svg>
                 </button>
-                <h2 class="nav-title">Overview</h2>
+                <h2 class="nav-title">總覽</h2>
             </div>
 
             <div class="overview-cards">
@@ -171,7 +171,7 @@
                         </svg>
                     </div>
                     <div class="card-content">
-                        <span class="card-label">Total Income</span>
+                        <span class="card-label">總收入</span>
                         <span class="card-amount" id="overviewIncome">$8,500</span>
                     </div>
                 </div>
@@ -183,7 +183,7 @@
                         </svg>
                     </div>
                     <div class="card-content">
-                        <span class="card-label">Total Expenses</span>
+                        <span class="card-label">總支出</span>
                         <span class="card-amount" id="overviewExpenses">$3,800</span>
                     </div>
                 </div>
@@ -191,13 +191,13 @@
 
             <div class="statistics-section">
                 <div class="section-header">
-                    <h3>Statistics</h3>
+                    <h3>統計</h3>
                     <div class="date-range">
                         <span id="dateRange">Apr 01 - Apr 30</span>
                         <select id="periodSelect">
-                            <option value="monthly">Monthly</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="yearly">Yearly</option>
+                            <option value="monthly">每月</option>
+                            <option value="weekly">每週</option>
+                            <option value="yearly">每年</option>
                         </select>
                     </div>
                 </div>
@@ -208,8 +208,8 @@
 
             <div class="toggle-section">
                 <div class="toggle-buttons">
-                    <button class="toggle-btn active" data-type="income">Income</button>
-                    <button class="toggle-btn" data-type="expense">Expenses</button>
+                    <button class="toggle-btn active" data-type="income">收入</button>
+                    <button class="toggle-btn" data-type="expense">支出</button>
                 </div>
                 <div class="categories-list" id="categoriesList">
                     <!-- Categories will be populated here -->
@@ -227,7 +227,7 @@
                         <circle cx="12" cy="19" r="2" fill="#333"/>
                     </svg>
                 </button>
-                <h2 class="nav-title">Calendar</h2>
+                <h2 class="nav-title">日曆</h2>
             </div>
 
             <div class="calendar-header">
@@ -246,13 +246,13 @@
 
             <div class="calendar-grid">
                 <div class="calendar-weekdays">
-                    <span>Sun</span>
-                    <span>Mon</span>
-                    <span>Tue</span>
-                    <span>Wed</span>
-                    <span>Thu</span>
-                    <span>Fri</span>
-                    <span>Sat</span>
+                    <span>日</span>
+                    <span>一</span>
+                    <span>二</span>
+                    <span>三</span>
+                    <span>四</span>
+                    <span>五</span>
+                    <span>六</span>
                 </div>
                 <div class="calendar-days" id="calendarDays">
                     <!-- Calendar days will be populated here -->
@@ -270,41 +270,41 @@
                         <circle cx="12" cy="19" r="2" fill="#333"/>
                     </svg>
                 </button>
-                <h2 class="nav-title">Settings</h2>
+                <h2 class="nav-title">設定</h2>
             </div>
 
             <div class="settings-sections">
                 <div class="settings-section">
-                    <h3>Budget & Goals</h3>
+                    <h3>預算與目標</h3>
                     <div class="setting-item">
-                        <span>Monthly Budget</span>
+                        <span>每月預算</span>
                         <input type="number" id="monthlyBudgetInput" placeholder="2000">
                     </div>
                     <div class="setting-item">
-                        <span>Savings Goal</span>
+                        <span>儲蓄目標</span>
                         <input type="number" id="savingsGoalInput" placeholder="1000">
                     </div>
                 </div>
 
                 <div class="settings-section">
-                    <h3>Security</h3>
+                    <h3>安全性</h3>
                     <div class="setting-item">
-                        <span>PIN Lock</span>
+                        <span>PIN 鎖定</span>
                         <label class="switch">
                             <input type="checkbox" id="pinLockToggle">
                             <span class="slider"></span>
                         </label>
                     </div>
                     <div class="setting-item">
-                        <span>Change PIN</span>
-                        <button class="setting-btn" onclick="showChangePinDialog()">Change</button>
+                        <span>更改 PIN</span>
+                        <button class="setting-btn" onclick="showChangePinDialog()">更改</button>
                     </div>
                 </div>
 
                 <div class="settings-section">
-                    <h3>Notifications</h3>
+                    <h3>通知</h3>
                     <div class="setting-item">
-                        <span>Daily Reminder</span>
+                        <span>每日提醒</span>
                         <label class="switch">
                             <input type="checkbox" id="dailyReminderToggle">
                             <span class="slider"></span>
@@ -313,9 +313,9 @@
                 </div>
 
                 <div class="settings-section">
-                    <h3>Cloud Sync</h3>
+                    <h3>雲端同步</h3>
                     <div class="setting-item">
-                        <span>Enable Sync</span>
+                        <span>啟用同步</span>
                         <label class="switch">
                             <input type="checkbox" id="cloudSyncToggle">
                             <span class="slider"></span>
@@ -332,14 +332,14 @@
                 </div>
 
                 <div class="settings-section">
-                    <h3>Categories</h3>
-                    <button class="setting-btn" onclick="showCategoriesDialog()">Manage Categories</button>
+                    <h3>類別</h3>
+                    <button class="setting-btn" onclick="showCategoriesDialog()">管理類別</button>
                 </div>
 
                 <div class="settings-section">
-                    <h3>Data</h3>
-                    <button class="setting-btn" onclick="exportData()">Export Data</button>
-                    <button class="setting-btn" onclick="importData()">Import Data</button>
+                    <h3>資料</h3>
+                    <button class="setting-btn" onclick="exportData()">匯出資料</button>
+                    <button class="setting-btn" onclick="importData()">匯入資料</button>
                 </div>
             </div>
         </div>
@@ -351,7 +351,7 @@
                     <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M9 22V12H15V22" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <span>Home</span>
+                <span>首頁</span>
             </button>
             
             <button class="nav-item" data-screen="overview">
@@ -361,7 +361,7 @@
                     <rect x="14" y="14" width="7" height="7" stroke="#666" stroke-width="2"/>
                     <rect x="3" y="14" width="7" height="7" stroke="#666" stroke-width="2"/>
                 </svg>
-                <span>Overview</span>
+                <span>總覽</span>
             </button>
             
             <!-- FAB Button -->
@@ -376,7 +376,7 @@
                     <rect x="3" y="4" width="18" height="18" rx="2" stroke="#666" stroke-width="2"/>
                     <path d="M16 2V6M8 2V6M3 10H21" stroke="#666" stroke-width="2" stroke-linecap="round"/>
                 </svg>
-                <span>Calendar</span>
+                <span>日曆</span>
             </button>
             
             <button class="nav-item" data-screen="settings">
@@ -384,7 +384,7 @@
                     <circle cx="12" cy="12" r="3" stroke="#666" stroke-width="2"/>
                     <path d="M12 1V6M12 18V23M4.22 4.22L7.76 7.76M16.24 16.24L19.78 19.78M1 12H6M18 12H23M4.22 19.78L7.76 16.24M16.24 7.76L19.78 4.22" stroke="#666" stroke-width="2" stroke-linecap="round"/>
                 </svg>
-                <span>Settings</span>
+                <span>設定</span>
             </button>
         </div>
     </div>
@@ -393,32 +393,32 @@
     <div id="addTransactionSheet" class="bottom-sheet">
         <div class="sheet-handle"></div>
         <div class="sheet-content">
-            <h3>Add Transaction</h3>
+            <h3>新增交易</h3>
             
             <div class="toggle-buttons">
-                <button class="toggle-btn active" data-type="income">Income</button>
-                <button class="toggle-btn" data-type="expense">Expense</button>
+                <button class="toggle-btn active" data-type="income">收入</button>
+                <button class="toggle-btn" data-type="expense">支出</button>
             </div>
 
             <div class="form-group">
-                <label>Amount</label>
+                <label>金額</label>
                 <input type="number" id="transactionAmount" placeholder="0.00" step="0.01">
             </div>
 
             <div class="form-group">
-                <label>Category</label>
+                <label>類別</label>
                 <select id="transactionCategory">
                     <!-- Categories will be populated here -->
                 </select>
             </div>
 
             <div class="form-group">
-                <label>Note</label>
-                <input type="text" id="transactionNote" placeholder="Optional note">
+                <label>備註</label>
+                <input type="text" id="transactionNote" placeholder="選填備註">
             </div>
 
             <div class="form-group">
-                <label>Date</label>
+                <label>日期</label>
                 <input type="date" id="transactionDate">
             </div>
 
@@ -427,13 +427,13 @@
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                         <path d="M3 7V4C3 3.44772 3.44772 3 4 3H7M17 7V4C17 3.44772 16.5523 3 16 3H13M13 17H16C16.5523 17 17 16.5523 17 16V13M7 17H4C3.44772 17 3 16.5523 3 16V13" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"/>
                     </svg>
-                    Scan Receipt
+                    掃描收據
                 </button>
             </div>
 
             <div class="sheet-actions">
-                <button class="cancel-btn" onclick="closeAddTransaction()">Cancel</button>
-                <button class="save-btn" onclick="saveTransaction()">Save</button>
+                <button class="cancel-btn" onclick="closeAddTransaction()">取消</button>
+                <button class="save-btn" onclick="saveTransaction()">儲存</button>
             </div>
         </div>
     </div>
@@ -442,18 +442,18 @@
     <div id="categoriesModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Manage Categories</h3>
+                <h3>管理類別</h3>
                 <button class="close-btn" onclick="closeCategoriesDialog()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="categories-tabs">
-                    <button class="tab-btn active" data-tab="income">Income</button>
-                    <button class="tab-btn" data-tab="expense">Expense</button>
+                    <button class="tab-btn active" data-tab="income">收入</button>
+                    <button class="tab-btn" data-tab="expense">支出</button>
                 </div>
                 <div class="categories-management">
                     <div class="add-category">
-                        <input type="text" id="newCategoryName" placeholder="New category name">
-                        <button onclick="addCategory()">Add</button>
+                        <input type="text" id="newCategoryName" placeholder="新類別名稱">
+                        <button onclick="addCategory()">新增</button>
                     </div>
                     <div class="categories-list-management" id="categoriesListManagement">
                         <!-- Categories will be populated here -->
@@ -467,25 +467,25 @@
     <div id="changePinModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Change PIN</h3>
+                <h3>更改 PIN</h3>
                 <button class="close-btn" onclick="closeChangePinDialog()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Current PIN</label>
+                    <label>目前 PIN</label>
                     <input type="password" id="currentPin" maxlength="6" pattern="[0-9]*" inputmode="numeric">
                 </div>
                 <div class="form-group">
-                    <label>New PIN</label>
+                    <label>新 PIN</label>
                     <input type="password" id="newPin" maxlength="6" pattern="[0-9]*" inputmode="numeric">
                 </div>
                 <div class="form-group">
-                    <label>Confirm New PIN</label>
+                    <label>確認新 PIN</label>
                     <input type="password" id="confirmNewPin" maxlength="6" pattern="[0-9]*" inputmode="numeric">
                 </div>
                 <div class="modal-actions">
-                    <button class="cancel-btn" onclick="closeChangePinDialog()">Cancel</button>
-                    <button class="save-btn" onclick="changePin()">Change PIN</button>
+                    <button class="cancel-btn" onclick="closeChangePinDialog()">取消</button>
+                    <button class="save-btn" onclick="changePin()">更改 PIN</button>
                 </div>
             </div>
         </div>

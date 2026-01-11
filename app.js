@@ -409,7 +409,7 @@ class ExpenseTracker {
             const amountPrefix = transaction.type === 'income' ? '+' : '-';
             
             return `
-                <div class="transaction-item" data-id="${transaction.id}">
+                <div class="transaction-item" data-id="${transaction.id}" onclick="showTransactionActions('${transaction.id}')">
                     <div class="transaction-icon" style="background: ${this.getCategoryColor(transaction.category)}">
                         ${categoryIcon}
                     </div>
@@ -904,6 +904,9 @@ function closeAddTransaction() {
     document.getElementById('transactionAmount').value = '';
     document.getElementById('transactionNote').value = '';
     document.getElementById('transactionCategory').selectedIndex = 0;
+    
+    // 清除編輯狀態
+    window.editingTransactionId = null;
 }
 
 async function saveTransaction() {
@@ -915,7 +918,7 @@ async function saveTransaction() {
         const type = app.transactionType;
 
         if (!amount || !category || !date) {
-            alert('Please fill in all required fields');
+            alert('請填寫所有必填欄位');
             return;
         }
 
@@ -927,6 +930,12 @@ async function saveTransaction() {
             note
         };
 
+        // 檢查是否為編輯模式
+        if (window.editingTransactionId) {
+            await db.deleteTransaction(window.editingTransactionId);
+            window.editingTransactionId = null;
+        }
+        
         await db.addTransaction(transaction);
         closeAddTransaction();
         app.updateAllData();
@@ -934,7 +943,7 @@ async function saveTransaction() {
         console.log('Transaction saved successfully');
     } catch (error) {
         console.error('Error saving transaction:', error);
-        alert('Error saving transaction. Please try again.');
+        alert('儲存失敗，請重試');
     }
 }
 
@@ -1164,6 +1173,101 @@ async function showAllTransactions() {
 function closeAllTransactions() {
     const modal = document.getElementById('allTransactionsModal');
     if (modal) modal.remove();
+}
+
+// 顯示交易操作選單（編輯/刪除）
+async function showTransactionActions(transactionId) {
+    try {
+        const transactions = await db.getTransactions();
+        const transaction = transactions.find(t => t.id === transactionId);
+        
+        if (!transaction) return;
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.id = 'transactionActionsModal';
+        modal.style.display = 'flex';
+        
+        const amountClass = transaction.type === 'income' ? 'income' : 'expense';
+        const amountPrefix = transaction.type === 'income' ? '+' : '-';
+        
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 350px;">
+                <div class="modal-header">
+                    <h3>交易詳情</h3>
+                    <button class="close-btn" onclick="closeTransactionActions()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="text-align: center; padding: 16px 0;">
+                        <div style="font-size: 24px; font-weight: 600;" class="${amountClass}">
+                            ${amountPrefix}${app.formatCurrency(transaction.amount)}
+                        </div>
+                        <div style="color: #666; margin-top: 8px;">${transaction.category}</div>
+                        <div style="color: #999; font-size: 12px; margin-top: 4px;">${transaction.date}</div>
+                        ${transaction.note ? `<div style="color: #888; font-size: 13px; margin-top: 8px;">${transaction.note}</div>` : ''}
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-top: 16px;">
+                        <button onclick="editTransactionFromHome('${transactionId}')" style="flex: 1; padding: 12px; background: #8B5CF6; color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer;">
+                            編輯
+                        </button>
+                        <button onclick="deleteTransactionFromHome('${transactionId}')" style="flex: 1; padding: 12px; background: #EF4444; color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer;">
+                            刪除
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    } catch (error) {
+        console.error('Error showing transaction actions:', error);
+    }
+}
+
+function closeTransactionActions() {
+    const modal = document.getElementById('transactionActionsModal');
+    if (modal) modal.remove();
+}
+
+async function editTransactionFromHome(transactionId) {
+    try {
+        const transactions = await db.getTransactions();
+        const transaction = transactions.find(t => t.id === transactionId);
+        
+        if (transaction) {
+            closeTransactionActions();
+            
+            // 設定表單
+            document.getElementById('transactionAmount').value = transaction.amount;
+            document.getElementById('transactionCategory').value = transaction.category;
+            document.getElementById('transactionNote').value = transaction.note || '';
+            document.getElementById('transactionDate').value = transaction.date;
+            
+            // 設定交易類型
+            app.setTransactionType(transaction.type);
+            
+            // 儲存編輯中的交易 ID
+            window.editingTransactionId = transactionId;
+            
+            // 打開表單
+            openAddTransaction();
+        }
+    } catch (error) {
+        console.error('Error editing transaction:', error);
+    }
+}
+
+async function deleteTransactionFromHome(transactionId) {
+    if (confirm('確定要刪除這筆交易嗎？')) {
+        try {
+            await db.deleteTransaction(transactionId);
+            closeTransactionActions();
+            app.updateAllData();
+        } catch (error) {
+            console.error('Error deleting transaction:', error);
+            alert('刪除失敗，請重試');
+        }
+    }
 }
 
 // Initialize app when DOM is loaded
