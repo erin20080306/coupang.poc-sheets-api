@@ -564,35 +564,35 @@ async function initializeSampleData() {
                     type: 'expense',
                     amount: 450,
                     category: '餐飲',
-                    note: 'Money Transfer'
+                    note: ''
                 },
                 {
                     date: new Date().toISOString().slice(0, 10),
                     type: 'income',
                     amount: 1200,
                     category: '薪水',
-                    note: 'Paypal'
+                    note: ''
                 },
                 {
                     date: new Date(Date.now() - 86400000).toISOString().slice(0, 10),
                     type: 'expense',
                     amount: 150,
                     category: '交通',
-                    note: 'Uber'
+                    note: ''
                 },
                 {
                     date: new Date(Date.now() - 86400000).toISOString().slice(0, 10),
                     type: 'expense',
                     amount: 200,
                     category: '購物',
-                    note: 'Bata Store'
+                    note: ''
                 },
                 {
                     date: new Date(Date.now() - 172800000).toISOString().slice(0, 10),
                     type: 'expense',
                     amount: 600,
                     category: '帳單',
-                    note: 'Bank Transfer'
+                    note: ''
                 }
             ];
 

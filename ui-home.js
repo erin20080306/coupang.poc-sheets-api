@@ -19,13 +19,8 @@ class HomeScreenUI {
             });
         }
 
-        // Transaction item clicks
-        document.addEventListener('click', (e) => {
-            const transactionItem = e.target.closest('.transaction-item');
-            if (transactionItem) {
-                this.handleTransactionClick(transactionItem);
-            }
-        });
+        // Transaction item clicks - handled by onclick in app.js renderTransactionItems
+        // No duplicate listener needed here
 
         // Balance dropdown
         const balanceHeader = document.querySelector('.balance-header');
@@ -175,68 +170,7 @@ class HomeScreenUI {
         }
     }
 
-    handleTransactionClick(transactionElement) {
-        // Get transaction data from the element
-        const transactionData = this.getTransactionDataFromElement(transactionElement);
-        if (transactionData) {
-            this.showTransactionDetails(transactionData);
-        }
-    }
-
-    getTransactionDataFromElement(element) {
-        // This would extract the full transaction data
-        // For now, we'll return a placeholder
-        return {
-            id: 'temp-id',
-            amount: 100,
-            category: 'Sample',
-            type: 'expense',
-            date: new Date().toISOString().slice(0, 10),
-            note: 'Sample transaction'
-        };
-    }
-
-    showTransactionDetails(transaction) {
-        // Create a modal to show transaction details
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.style.display = 'flex';
-        
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>交易詳情</h3>
-                    <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="transaction-detail-item">
-                        <span>金額：</span>
-                        <span class="${transaction.type === 'income' ? 'income' : 'expense'}">
-                            ${transaction.type === 'income' ? '+' : '-'}${this.app.formatCurrency(transaction.amount)}
-                        </span>
-                    </div>
-                    <div class="transaction-detail-item">
-                        <span>類別：</span>
-                        <span>${transaction.category}</span>
-                    </div>
-                    <div class="transaction-detail-item">
-                        <span>日期：</span>
-                        <span>${new Date(transaction.date + 'T00:00:00').toLocaleDateString('zh-TW')}</span>
-                    </div>
-                    <div class="transaction-detail-item">
-                        <span>備註：</span>
-                        <span>${transaction.note || ''}</span>
-                    </div>
-                    <div class="modal-actions">
-                        <button class="edit-btn" onclick="homeUI.editTransaction('${transaction.id}')">編輯</button>
-                        <button class="delete-btn" onclick="homeUI.deleteTransaction('${transaction.id}')">刪除</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-    }
+    // Transaction click handling is done by showTransactionActions in app.js
 
     async editTransaction(transactionId) {
         try {
