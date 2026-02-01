@@ -4,9 +4,11 @@ class OverviewScreenUI {
         this.app = app;
         this.currentPeriod = 'monthly';
         this.currentView = 'income';
-        this.selectedYear = new Date().getFullYear();
-        this.selectedMonthIndex = new Date().getMonth(); // 0-11
-        this.cachedStats = null; // Cache stats for toggle buttons
+        // Use separate variables for year and month to avoid Date mutation issues
+        const now = new Date();
+        this._selectedYear = now.getFullYear();
+        this._selectedMonth = now.getMonth(); // 0-11
+        this._cachedStats = null;
         this.init();
     }
 
@@ -16,23 +18,29 @@ class OverviewScreenUI {
         this.updateMonthDisplay();
     }
     
-    // Month navigation
+    // Month navigation - create new values instead of mutating
     previousMonth() {
-        this.selectedMonthIndex--;
-        if (this.selectedMonthIndex < 0) {
-            this.selectedMonthIndex = 11;
-            this.selectedYear--;
+        let newMonth = this._selectedMonth - 1;
+        let newYear = this._selectedYear;
+        if (newMonth < 0) {
+            newMonth = 11;
+            newYear--;
         }
+        this._selectedMonth = newMonth;
+        this._selectedYear = newYear;
         this.updateMonthDisplay();
         this.updateOverview();
     }
     
     nextMonth() {
-        this.selectedMonthIndex++;
-        if (this.selectedMonthIndex > 11) {
-            this.selectedMonthIndex = 0;
-            this.selectedYear++;
+        let newMonth = this._selectedMonth + 1;
+        let newYear = this._selectedYear;
+        if (newMonth > 11) {
+            newMonth = 0;
+            newYear++;
         }
+        this._selectedMonth = newMonth;
+        this._selectedYear = newYear;
         this.updateMonthDisplay();
         this.updateOverview();
     }
@@ -40,7 +48,7 @@ class OverviewScreenUI {
     updateMonthDisplay() {
         const monthEl = document.getElementById('overviewMonth');
         if (monthEl) {
-            monthEl.textContent = `${this.selectedYear}年${this.selectedMonthIndex + 1}月`;
+            monthEl.textContent = `${this._selectedYear}年${this._selectedMonth + 1}月`;
         }
     }
 
@@ -62,7 +70,6 @@ class OverviewScreenUI {
                 e.currentTarget.classList.add('active');
                 
                 const type = e.currentTarget.dataset.type;
-                console.log('Toggle clicked:', type, 'cachedStats:', this.cachedStats);
                 if (type) {
                     this.currentView = type;
                     this.updateCategoriesList();
@@ -131,13 +138,10 @@ class OverviewScreenUI {
     async updateOverview() {
         try {
             const dateRange = this.getDateRangeForPeriod(this.currentPeriod);
-            console.log('Overview dateRange:', dateRange, 'Year:', this.selectedYear, 'Month:', this.selectedMonthIndex);
-            
             const stats = await db.getStatistics(dateRange.start, dateRange.end);
-            console.log('Overview stats:', stats);
             
             // Cache stats for toggle buttons
-            this.cachedStats = stats;
+            this._cachedStats = stats;
             
             // Update overview cards
             this.updateOverviewCards(stats);
@@ -351,9 +355,9 @@ class OverviewScreenUI {
     }
 
     getDateRangeForPeriod(period) {
-        // Use selectedYear and selectedMonthIndex
-        const year = this.selectedYear;
-        const month = this.selectedMonthIndex;
+        // Use private variables for year and month
+        const year = this._selectedYear;
+        const month = this._selectedMonth;
         let start, end;
         
         switch (period) {
@@ -401,19 +405,14 @@ class OverviewScreenUI {
 
     updateCategoriesList(stats = null) {
         const container = document.getElementById('categoriesList');
-        if (!container) {
-            console.log('categoriesList container not found');
-            return;
-        }
+        if (!container) return;
 
         container.innerHTML = '';
 
         // Use cached stats if no stats provided
-        const useStats = stats || this.cachedStats;
-        console.log('updateCategoriesList - currentView:', this.currentView, 'useStats:', useStats);
+        const useStats = stats || this._cachedStats;
         
         if (!useStats) {
-            console.log('No stats available');
             container.innerHTML = `
                 <div style="text-align: center; padding: 40px; color: #666;">
                     <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
@@ -426,8 +425,6 @@ class OverviewScreenUI {
         const categories = this.currentView === 'income' ? 
             (useStats.incomeByCategory || {}) : 
             (useStats.expensesByCategory || {});
-        
-        console.log('Categories for', this.currentView, ':', categories);
 
         // Sort categories by amount
         const sortedCategories = Object.entries(categories)
@@ -607,7 +604,7 @@ class OverviewScreenUI {
     async showCardDetails(card) {
         const isIncome = card.querySelector('.income-icon');
         const type = isIncome ? 'income' : 'expense';
-        const monthName = `${this.selectedYear}年${this.selectedMonthIndex + 1}月`;
+        const monthName = `${this._selectedYear}年${this._selectedMonth + 1}月`;
         const title = type === 'income' ? `💰 ${monthName}收入明細` : `💸 ${monthName}支出明細`;
         const totalAmount = card.querySelector('.card-amount').textContent;
         
