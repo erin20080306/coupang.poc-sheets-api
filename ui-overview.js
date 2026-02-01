@@ -4,7 +4,9 @@ class OverviewScreenUI {
         this.app = app;
         this.currentPeriod = 'monthly';
         this.currentView = 'income';
-        this.selectedMonth = new Date(); // Track selected month
+        this.selectedYear = new Date().getFullYear();
+        this.selectedMonthIndex = new Date().getMonth(); // 0-11
+        this.cachedStats = null; // Cache stats for toggle buttons
         this.init();
     }
 
@@ -16,13 +18,21 @@ class OverviewScreenUI {
     
     // Month navigation
     previousMonth() {
-        this.selectedMonth.setMonth(this.selectedMonth.getMonth() - 1);
+        this.selectedMonthIndex--;
+        if (this.selectedMonthIndex < 0) {
+            this.selectedMonthIndex = 11;
+            this.selectedYear--;
+        }
         this.updateMonthDisplay();
         this.updateOverview();
     }
     
     nextMonth() {
-        this.selectedMonth.setMonth(this.selectedMonth.getMonth() + 1);
+        this.selectedMonthIndex++;
+        if (this.selectedMonthIndex > 11) {
+            this.selectedMonthIndex = 0;
+            this.selectedYear++;
+        }
         this.updateMonthDisplay();
         this.updateOverview();
     }
@@ -30,9 +40,7 @@ class OverviewScreenUI {
     updateMonthDisplay() {
         const monthEl = document.getElementById('overviewMonth');
         if (monthEl) {
-            const year = this.selectedMonth.getFullYear();
-            const month = this.selectedMonth.getMonth() + 1;
-            monthEl.textContent = `${year}年${month}月`;
+            monthEl.textContent = `${this.selectedYear}年${this.selectedMonthIndex + 1}月`;
         }
     }
 
@@ -119,6 +127,9 @@ class OverviewScreenUI {
         try {
             const dateRange = this.getDateRangeForPeriod(this.currentPeriod);
             const stats = await db.getStatistics(dateRange.start, dateRange.end);
+            
+            // Cache stats for toggle buttons
+            this.cachedStats = stats;
             
             // Update overview cards
             this.updateOverviewCards(stats);
@@ -332,12 +343,14 @@ class OverviewScreenUI {
     }
 
     getDateRangeForPeriod(period) {
-        // Use selectedMonth instead of current date
-        const selectedDate = this.selectedMonth || new Date();
+        // Use selectedYear and selectedMonthIndex
+        const year = this.selectedYear;
+        const month = this.selectedMonthIndex;
         let start, end;
         
         switch (period) {
             case 'weekly':
+                const selectedDate = new Date(year, month, 15);
                 const dayOfWeek = selectedDate.getDay();
                 start = new Date(selectedDate);
                 start.setDate(selectedDate.getDate() - dayOfWeek);
@@ -345,16 +358,16 @@ class OverviewScreenUI {
                 end.setDate(start.getDate() + 6);
                 break;
             case 'monthly':
-                start = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-                end = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+                start = new Date(year, month, 1);
+                end = new Date(year, month + 1, 0);
                 break;
             case 'yearly':
-                start = new Date(selectedDate.getFullYear(), 0, 1);
-                end = new Date(selectedDate.getFullYear(), 11, 31);
+                start = new Date(year, 0, 1);
+                end = new Date(year, 11, 31);
                 break;
             default:
-                start = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-                end = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+                start = new Date(year, month, 1);
+                end = new Date(year, month + 1, 0);
         }
         
         return {
@@ -384,9 +397,13 @@ class OverviewScreenUI {
 
         container.innerHTML = '';
 
+        // Use cached stats if no stats provided
+        const useStats = stats || this.cachedStats;
+        if (!useStats) return;
+
         const categories = this.currentView === 'income' ? 
-            (stats?.incomeByCategory || {}) : 
-            (stats?.expensesByCategory || {});
+            (useStats.incomeByCategory || {}) : 
+            (useStats.expensesByCategory || {});
 
         // Sort categories by amount
         const sortedCategories = Object.entries(categories)
@@ -566,7 +583,8 @@ class OverviewScreenUI {
     async showCardDetails(card) {
         const isIncome = card.querySelector('.income-icon');
         const type = isIncome ? 'income' : 'expense';
-        const title = type === 'income' ? '💰 本月收入明細' : '💸 本月支出明細';
+        const monthName = `${this.selectedYear}年${this.selectedMonthIndex + 1}月`;
+        const title = type === 'income' ? `💰 ${monthName}收入明細` : `💸 ${monthName}支出明細`;
         const totalAmount = card.querySelector('.card-amount').textContent;
         
         // Get transactions for current period
