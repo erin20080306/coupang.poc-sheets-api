@@ -502,34 +502,43 @@ class CalendarScreenUI {
             try {
                 await db.deleteTransaction(transactionId);
                 
-                // Get modal and date info before any updates
+                // Close modal immediately so user can see calendar update
                 const modal = document.querySelector('.modal');
-                const dateKey = modal ? modal.dataset.date : null;
+                if (modal) modal.remove();
                 
-                // Immediately update calendar first (user sees update right away)
+                // Update calendar immediately
                 await this.updateCalendar();
                 
-                // Then update modal if still open
-                if (modal && dateKey) {
-                    const transactions = await db.getTransactionsByDate(dateKey);
-                    
-                    if (transactions.length === 0) {
-                        modal.remove();
-                    } else {
-                        // Refresh the transactions list
-                        const listContainer = modal.querySelector('.day-transactions-list');
-                        if (listContainer) {
-                            listContainer.innerHTML = this.renderDayTransactions(transactions);
-                        }
-                        // Update summary cards
-                        this.updateSummaryCards(modal, transactions);
-                    }
-                }
+                // Show success toast
+                this.showDeleteSuccess();
                 
             } catch (error) {
                 console.error('Error deleting transaction:', error);
             }
         }
+    }
+    
+    showDeleteSuccess() {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #EF4444;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+        `;
+        toast.textContent = '已刪除交易';
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 2000);
     }
 
     updateSummaryCards(modal, transactions) {
