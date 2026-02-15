@@ -950,11 +950,6 @@ const App = () => {
           
           {/* 1. 班表月曆 */}
           {activeTab === 'calendar' && (
-            sheetData.schedule.rows.length === 0 ? (
-              <div className="bg-slate-100 border border-slate-200 rounded-2xl p-8 text-center">
-                <p className="text-slate-500 font-bold text-lg">📅 {selectedMonth}月本月系統無資料或已清除</p>
-              </div>
-            ) : (
             <section className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 overflow-hidden">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -1026,7 +1021,7 @@ const App = () => {
                 </div>
               </div>
             </section>
-          ))}
+          )}
 
           {/* 2. 工時明細 */}
           {activeTab === 'attendance' && (
@@ -1336,9 +1331,9 @@ const App = () => {
                         <thead>
                           <tr className="bg-[#EFEFEF] text-slate-500 text-center">
                             {displayHeaders.map((header, idx) => {
-                              const isEmpty = !String(header || '').trim();
+                              const hasHeader = String(header || '').trim();
                               return (
-                                <th key={idx} className={`px-4 py-3 whitespace-nowrap ${isEmpty ? '' : 'border border-slate-300 bg-[#EFEFEF]'}`}>{header}</th>
+                                <th key={idx} className={`px-4 py-3 whitespace-nowrap ${hasHeader ? 'border border-slate-300 bg-[#EFEFEF]' : ''}`}>{header}</th>
                               );
                             })}
                           </tr>
@@ -1350,12 +1345,12 @@ const App = () => {
                                 const value = String(row[header] || '');
                                 const bgColor = row._bg?.[colIdx] || '';
                                 const textColor = row._fc?.[colIdx] || '';
-                                const isEmpty = !value.trim();
+                                const hasHeader = String(header || '').trim();
                                 return (
                                   <td key={colIdx} 
-                                    className={`px-4 py-3 text-center whitespace-nowrap ${isEmpty ? '' : 'border border-slate-300'}`}
+                                    className={`px-4 py-3 text-center whitespace-nowrap ${hasHeader ? 'border border-slate-300' : ''}`}
                                     style={{ 
-                                      backgroundColor: isEmpty ? 'transparent' : (bgColor || undefined),
+                                      backgroundColor: bgColor || undefined,
                                       color: textColor || undefined
                                     }}>
                                     {value}
