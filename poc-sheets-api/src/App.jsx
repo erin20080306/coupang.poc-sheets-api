@@ -978,16 +978,16 @@ const App = () => {
                   </button>
                 </div>
               </div>
-              <div ref={calendarRef} className="bg-white p-6">
-                <div className="text-center mb-3 text-sm font-bold text-slate-600">{user.name} - {year}年{selectedMonth}月 班表</div>
-                <div className="grid grid-cols-7 gap-2">
+              <div ref={calendarRef} className="bg-white p-4">
+                <div className="text-center mb-2 text-sm font-bold text-slate-600">{user.name} - {year}年{selectedMonth}月 班表</div>
+                <div className="grid grid-cols-7 gap-1">
                   {['日','一','二','三','四','五','六'].map(w => (
                     <div key={w} className="text-center text-xs font-bold text-slate-400 py-1">{w}</div>
                   ))}
                   {/* 上個月跨月日期 */}
                   {prevMonthDates.map((d) => (
-                    <div key={`prev-${d}`} className="h-12 rounded-lg flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50">
-                      <span className="text-lg font-bold leading-none text-slate-300">{d}</span>
+                    <div key={`prev-${d}`} className="aspect-square rounded flex flex-col items-center justify-start pt-1 border border-slate-50 bg-slate-50/50 overflow-hidden">
+                      <span className="text-xs font-bold text-slate-300">{d}</span>
                     </div>
                   ))}
                   {/* 當月日期 */}
@@ -1004,9 +1004,9 @@ const App = () => {
                       const displayStatus = isLeave ? status : '';
                       const hasStatus = isLeave && displayStatus;
                       return (
-                        <div key={d} className={`h-12 rounded-lg flex flex-col items-center justify-center border ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
-                          <span className={`text-lg font-black leading-none ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
-                          <span className={`text-[10px] font-bold leading-tight h-3 ${hasStatus ? config.text : 'text-transparent'}`}>{displayStatus || ' '}</span>
+                        <div key={d} className={`aspect-square rounded flex flex-col items-center justify-start pt-1 border ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'} overflow-hidden`}>
+                          <span className={`${hasStatus ? 'text-xs' : 'text-sm'} font-black ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
+                          {hasStatus && <span className={`text-[6px] font-bold leading-tight ${config.text}`}>{displayStatus}</span>}
                         </div>
                       );
                     }
@@ -1014,16 +1014,16 @@ const App = () => {
                     // 其他倉：顯示所有非「上班」和非空白的狀態
                     const displayStatus = isLeave ? status : '';
                     return (
-                      <div key={d} className={`h-12 rounded-lg flex flex-col items-center justify-center border ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
-                        <span className={`text-lg font-black leading-none ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
-                        <span className={`text-[10px] font-bold leading-tight h-3 ${displayStatus ? (isInLeaveMap ? config.text : 'text-slate-600') : 'text-transparent'}`}>{displayStatus || ' '}</span>
+                      <div key={d} className={`aspect-square rounded flex flex-col items-center justify-start pt-1 border ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'} overflow-hidden`}>
+                        <span className={`${displayStatus ? 'text-xs' : 'text-sm'} font-black ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
+                        {displayStatus && <span className={`text-[6px] font-bold leading-tight ${isInLeaveMap ? config.text : 'text-slate-600'}`}>{displayStatus}</span>}
                       </div>
                     );
                   })}
                   {/* 下個月跨月日期 */}
                   {nextMonthDates.map((d) => (
-                    <div key={`next-${d}`} className="h-12 rounded-lg flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50">
-                      <span className="text-lg font-bold leading-none text-slate-300">{d}</span>
+                    <div key={`next-${d}`} className="aspect-square rounded flex flex-col items-center justify-start pt-1 border border-slate-50 bg-slate-50/50 overflow-hidden">
+                      <span className="text-xs font-bold text-slate-300">{d}</span>
                     </div>
                   ))}
                 </div>
