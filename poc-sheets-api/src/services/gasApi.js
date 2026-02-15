@@ -352,19 +352,26 @@ export async function getSheetData(warehouse, sheetName, name = '', options = {}
 
 /**
  * 批量讀取多個分頁資料
- * PoC 版本：逐一呼叫 getSheetData
+ * PoC 版本：並行呼叫 getSheetData（提升速度）
  */
 export async function getBatchSheetData(warehouse, sheetNames, options = {}) {
   const results = {};
   
-  for (const sheetName of sheetNames) {
+  // 並行請求所有分頁
+  const promises = sheetNames.map(async (sheetName) => {
     try {
-      results[sheetName] = await getSheetData(warehouse, sheetName, options?.name, options);
+      const data = await getSheetData(warehouse, sheetName, options?.name, options);
+      return { sheetName, data };
     } catch (error) {
       console.error(`getBatchSheetData error for ${sheetName}:`, error);
-      results[sheetName] = { headers: [], rows: [], error: error.message };
+      return { sheetName, data: { headers: [], rows: [], error: error.message } };
     }
-  }
+  });
+  
+  const settled = await Promise.all(promises);
+  settled.forEach(({ sheetName, data }) => {
+    results[sheetName] = data;
+  });
   
   return results;
 }
