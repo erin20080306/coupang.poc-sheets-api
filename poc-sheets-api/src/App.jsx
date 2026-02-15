@@ -979,7 +979,7 @@ const App = () => {
           )}
           {activeTab === 'calendar' && !loading && (
             <section className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 overflow-hidden">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
                   <CalendarIcon size={20} className="text-blue-600" /> 班表
                 </h3>
@@ -992,10 +992,11 @@ const App = () => {
                   </button>
                   <button onClick={() => {setModalType('schedule'); setShowSheetModal(true);}} 
                     className="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
-                    <Maximize2 size={12}/> 原始表格
+                    <Maximize2 size={12}/> 酷澎提供原始樣式
                   </button>
                 </div>
               </div>
+              <p className="text-xs text-slate-400 mb-4">所有資料為酷澎提供系統匯入</p>
               <div ref={calendarRef} className="bg-white p-4">
                 <div className="text-center mb-2 text-sm font-bold text-slate-600">{user.name} - {year}年{selectedMonth}月 班表</div>
                 <div className="grid grid-cols-7 gap-1">
@@ -1057,25 +1058,28 @@ const App = () => {
               </div>
             ) : (
             <section className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="p-6 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                <h3 className="text-lg font-black text-slate-900">出勤查詢明細</h3>
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => downloadCalendarAsPng(attendanceRef, `工時明細_${user.name}_${year}年${selectedMonth}月.png`)}
-                    disabled={isDownloading}
-                    className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 disabled:opacity-50">
-                    {isDownloading ? <Loader2 size={12} className="animate-spin"/> : <Download size={12}/>} 下載
-                  </button>
-                  <button
-                    onClick={() => {
-                      setModalType('attendance');
-                      setShowSheetModal(true);
-                    }}
-                    className="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1"
-                  >
-                    <Maximize2 size={14}/> 原始樣式
-                  </button>
+              <div className="p-6 border-b border-slate-100 bg-slate-50">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-black text-slate-900">出勤查詢明細</h3>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => downloadCalendarAsPng(attendanceRef, `工時明細_${user.name}_${year}年${selectedMonth}月.png`)}
+                      disabled={isDownloading}
+                      className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 disabled:opacity-50">
+                      {isDownloading ? <Loader2 size={12} className="animate-spin"/> : <Download size={12}/>} 下載
+                    </button>
+                    <button
+                      onClick={() => {
+                        setModalType('attendance');
+                        setShowSheetModal(true);
+                      }}
+                      className="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1"
+                    >
+                      <Maximize2 size={14}/> 酷澎提供原始樣式
+                    </button>
+                  </div>
                 </div>
+                <p className="text-xs text-slate-400 mt-2">所有資料為酷澎提供系統匯入</p>
               </div>
               <div ref={attendanceRef} className="bg-white overflow-x-auto">
                 <div className="text-center py-3 text-sm font-bold text-slate-600">{user.name} - {year}年{selectedMonth}月 工時明細</div>
@@ -1183,10 +1187,11 @@ const App = () => {
                   </button>
                   <button onClick={() => {setModalType('records'); setShowSheetModal(true);}} 
                     className="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1">
-                    <Maximize2 size={14}/> 原始樣式
+                    <Maximize2 size={14}/> 酷澎提供原始樣式
                   </button>
                 </div>
               </div>
+              <p className="text-xs text-slate-400 px-6 mt-2">所有資料為酷澎提供系統匯入</p>
               <div ref={recordsCalendarRef} className="bg-white p-2">
                 <div className="text-center mb-3 text-sm font-bold text-slate-600">{user.name} - {year}年{selectedMonth}月 出勤記錄</div>
                 <div className="grid grid-cols-7 gap-2">
@@ -1243,9 +1248,10 @@ const App = () => {
                 </div>
                 <button onClick={() => {setModalType('adjustment'); setShowSheetModal(true);}} 
                   className="bg-white/20 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1 backdrop-blur-md">
-                  <Maximize2 size={14}/> 原始樣式
+                  <Maximize2 size={14}/> 酷澎提供原始樣式
                 </button>
               </div>
+              <p className="text-xs text-blue-200 px-6 mt-2">所有資料為酷澎提供系統匯入</p>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
