@@ -949,7 +949,17 @@ const App = () => {
         <main className="p-4 space-y-6">
           
           {/* 1. 班表月曆 */}
-          {activeTab === 'calendar' && (
+          {activeTab === 'calendar' && loading && (
+            <section className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 overflow-hidden">
+              <div className="flex items-center justify-center py-20">
+                <div className="text-center">
+                  <Loader2 size={40} className="animate-spin text-blue-500 mx-auto mb-4" />
+                  <p className="text-slate-500 font-bold">班表資料載入中...</p>
+                </div>
+              </div>
+            </section>
+          )}
+          {activeTab === 'calendar' && !loading && (
             <section className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 overflow-hidden">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
