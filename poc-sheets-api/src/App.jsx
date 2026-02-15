@@ -986,9 +986,8 @@ const App = () => {
                   ))}
                   {/* 上個月跨月日期 */}
                   {prevMonthDates.map((d) => (
-                    <div key={`prev-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm min-h-[48px]" style={{aspectRatio: '1/1'}}>
-                      <span className="text-xs font-bold text-slate-300">{prevMonth}月</span>
-                      <span className={`${isPWA ? 'text-2xl' : 'text-3xl'} font-bold leading-none text-slate-300`}>{d}</span>
+                    <div key={`prev-${d}`} className="h-12 rounded-lg flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50">
+                      <span className="text-lg font-bold leading-none text-slate-300">{d}</span>
                     </div>
                   ))}
                   {/* 當月日期 */}
@@ -1005,9 +1004,9 @@ const App = () => {
                       const displayStatus = isLeave ? status : '';
                       const hasStatus = isLeave && displayStatus;
                       return (
-                        <div key={d} className={`aspect-square rounded-xl flex flex-col items-center justify-center border ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'} shadow-sm min-h-[48px]`} style={{aspectRatio: '1/1'}}>
-                          <span className={`${isPWA ? 'text-2xl' : 'text-4xl'} font-black leading-none ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
-                          {displayStatus && <span className={`${isPWA ? 'text-xs' : 'text-base'} font-bold ${isPWA ? 'mt-0.5' : 'mt-1'} ${config.text}`}>{displayStatus}</span>}
+                        <div key={d} className={`h-12 rounded-lg flex flex-col items-center justify-center border ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
+                          <span className={`text-lg font-black leading-none ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
+                          <span className={`text-[10px] font-bold leading-tight h-3 ${hasStatus ? config.text : 'text-transparent'}`}>{displayStatus || ' '}</span>
                         </div>
                       );
                     }
@@ -1015,17 +1014,16 @@ const App = () => {
                     // 其他倉：顯示所有非「上班」和非空白的狀態
                     const displayStatus = isLeave ? status : '';
                     return (
-                      <div key={d} className={`aspect-square rounded-xl flex flex-col items-center justify-center border ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'} shadow-sm min-h-[48px]`} style={{aspectRatio: '1/1'}}>
-                        <span className={`${isPWA ? 'text-2xl' : 'text-4xl'} font-black leading-none ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
-                        {displayStatus && <span className={`${isPWA ? 'text-xs' : 'text-base'} font-bold ${isPWA ? 'mt-0.5' : 'mt-1'} ${isInLeaveMap ? config.text : 'text-slate-600'}`}>{displayStatus}</span>}
+                      <div key={d} className={`h-12 rounded-lg flex flex-col items-center justify-center border ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
+                        <span className={`text-lg font-black leading-none ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
+                        <span className={`text-[10px] font-bold leading-tight h-3 ${displayStatus ? (isInLeaveMap ? config.text : 'text-slate-600') : 'text-transparent'}`}>{displayStatus || ' '}</span>
                       </div>
                     );
                   })}
                   {/* 下個月跨月日期 */}
                   {nextMonthDates.map((d) => (
-                    <div key={`next-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm min-h-[48px]" style={{aspectRatio: '1/1'}}>
-                      <span className="text-xs font-bold text-slate-300">{nextMonth}月</span>
-                      <span className={`${isPWA ? 'text-2xl' : 'text-3xl'} font-bold leading-none text-slate-300`}>{d}</span>
+                    <div key={`next-${d}`} className="h-12 rounded-lg flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50">
+                      <span className="text-lg font-bold leading-none text-slate-300">{d}</span>
                     </div>
                   ))}
                 </div>
