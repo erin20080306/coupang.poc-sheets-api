@@ -686,16 +686,24 @@ const App = () => {
     try {
       const element = refElement.current;
       
-      // 暫時設定固定寬度，確保 grid 格式正確
+      // 暫時移除限制，確保完整捕獲
       const originalOverflow = element.style.overflow;
       const originalWidth = element.style.width;
       const originalMinWidth = element.style.minWidth;
+      const originalMaxHeight = element.style.maxHeight;
+      const originalHeight = element.style.height;
       element.style.overflow = 'visible';
-      element.style.width = '400px';
-      element.style.minWidth = '400px';
+      element.style.width = 'max-content';
+      element.style.minWidth = '350px';
+      element.style.maxHeight = 'none';
+      element.style.height = 'auto';
       
       // 等待重新渲染
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 150));
+      
+      // 取得實際尺寸
+      const actualWidth = Math.max(element.scrollWidth, 350);
+      const actualHeight = element.scrollHeight;
       
       // 使用 html2canvas 將元素轉換為 canvas
       const canvas = await html2canvas(element, {
@@ -710,8 +718,10 @@ const App = () => {
         // 確保完整區域都被捕獲
         scrollX: 0,
         scrollY: 0,
-        width: 400 + 48,
-        height: element.scrollHeight + 48,
+        windowWidth: actualWidth + 100,
+        windowHeight: actualHeight + 100,
+        width: actualWidth + 48,
+        height: actualHeight + 48,
         x: -24,
         y: -24,
       });
@@ -720,6 +730,8 @@ const App = () => {
       element.style.overflow = originalOverflow;
       element.style.width = originalWidth;
       element.style.minWidth = originalMinWidth;
+      element.style.maxHeight = originalMaxHeight;
+      element.style.height = originalHeight;
       
       // 使用 data URL
       const dataUrl = canvas.toDataURL('image/png', 1.0);
