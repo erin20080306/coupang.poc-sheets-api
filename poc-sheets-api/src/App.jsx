@@ -986,8 +986,9 @@ const App = () => {
                   ))}
                   {/* 上個月跨月日期 */}
                   {prevMonthDates.map((d) => (
-                    <div key={`prev-${d}`} className="aspect-square rounded flex flex-col items-center justify-start pt-2 border border-slate-50 bg-slate-50/50 overflow-hidden">
-                      <span className="text-base font-bold text-slate-300">{d}</span>
+                    <div key={`prev-${d}`} className="aspect-square rounded flex flex-col items-center justify-between py-1 border border-slate-50 bg-slate-50/50 overflow-hidden">
+                      <span className="text-lg font-bold text-slate-300">{d}</span>
+                      <span className="text-[10px] font-bold text-transparent"> </span>
                     </div>
                   ))}
                   {/* 當月日期 */}
@@ -1004,9 +1005,9 @@ const App = () => {
                       const displayStatus = isLeave ? status : '';
                       const hasStatus = isLeave && displayStatus;
                       return (
-                        <div key={d} className={`aspect-square rounded flex flex-col items-center justify-start pt-2 border ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'} overflow-hidden`}>
-                          <span className={`${hasStatus ? 'text-sm' : 'text-base'} font-black ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
-                          {hasStatus && <span className={`text-[8px] font-bold leading-tight ${config.text}`}>{displayStatus}</span>}
+                        <div key={d} className={`aspect-square rounded flex flex-col items-center justify-between py-1 border ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'} overflow-hidden`}>
+                          <span className={`text-lg font-black ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
+                          <span className={`text-[10px] font-bold leading-tight ${hasStatus ? config.text : 'text-transparent'}`}>{displayStatus || ' '}</span>
                         </div>
                       );
                     }
@@ -1014,16 +1015,17 @@ const App = () => {
                     // 其他倉：顯示所有非「上班」和非空白的狀態
                     const displayStatus = isLeave ? status : '';
                     return (
-                      <div key={d} className={`aspect-square rounded flex flex-col items-center justify-start pt-2 border ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'} overflow-hidden`}>
-                        <span className={`${displayStatus ? 'text-sm' : 'text-base'} font-black ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
-                        {displayStatus && <span className={`text-[8px] font-bold leading-tight ${isInLeaveMap ? config.text : 'text-slate-600'}`}>{displayStatus}</span>}
+                      <div key={d} className={`aspect-square rounded flex flex-col items-center justify-between py-1 border ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'} overflow-hidden`}>
+                        <span className={`text-lg font-black ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
+                        <span className={`text-[10px] font-bold leading-tight ${displayStatus ? (isInLeaveMap ? config.text : 'text-slate-600') : 'text-transparent'}`}>{displayStatus || ' '}</span>
                       </div>
                     );
                   })}
                   {/* 下個月跨月日期 */}
                   {nextMonthDates.map((d) => (
-                    <div key={`next-${d}`} className="aspect-square rounded flex flex-col items-center justify-start pt-2 border border-slate-50 bg-slate-50/50 overflow-hidden">
-                      <span className="text-base font-bold text-slate-300">{d}</span>
+                    <div key={`next-${d}`} className="aspect-square rounded flex flex-col items-center justify-between py-1 border border-slate-50 bg-slate-50/50 overflow-hidden">
+                      <span className="text-lg font-bold text-slate-300">{d}</span>
+                      <span className="text-[10px] font-bold text-transparent"> </span>
                     </div>
                   ))}
                 </div>
