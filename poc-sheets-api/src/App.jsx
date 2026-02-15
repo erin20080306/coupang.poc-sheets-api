@@ -686,11 +686,16 @@ const App = () => {
     try {
       const element = refElement.current;
       
-      // 暫時移除 overflow 限制，確保完整捕獲
+      // 暫時設定固定寬度，確保 grid 格式正確
       const originalOverflow = element.style.overflow;
       const originalWidth = element.style.width;
+      const originalMinWidth = element.style.minWidth;
       element.style.overflow = 'visible';
-      element.style.width = 'max-content';
+      element.style.width = '400px';
+      element.style.minWidth = '400px';
+      
+      // 等待重新渲染
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // 使用 html2canvas 將元素轉換為 canvas
       const canvas = await html2canvas(element, {
@@ -705,7 +710,7 @@ const App = () => {
         // 確保完整區域都被捕獲
         scrollX: 0,
         scrollY: 0,
-        width: element.scrollWidth + 48,
+        width: 400 + 48,
         height: element.scrollHeight + 48,
         x: -24,
         y: -24,
@@ -714,6 +719,7 @@ const App = () => {
       // 還原樣式
       element.style.overflow = originalOverflow;
       element.style.width = originalWidth;
+      element.style.minWidth = originalMinWidth;
       
       // 使用 data URL
       const dataUrl = canvas.toDataURL('image/png', 1.0);
