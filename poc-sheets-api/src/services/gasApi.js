@@ -413,9 +413,21 @@ export function parseSheetData(rawData, options = {}) {
     // 確保 values 是陣列
     const valuesArray = Array.isArray(values) ? values : [];
     
+    // 確保所有表頭都有對應的 key（即使值是空的）
     for (let i = 0; i < headers.length; i++) {
       const header = headers[i] || `col_${i + 1}`;
+      // 使用原始表頭作為 key，保留換行符等特殊字元
       rowData[header] = valuesArray[i] ?? '';
+    }
+    
+    // 額外：為含換行符的表頭建立正規化的 key（移除換行符）
+    for (let i = 0; i < headers.length; i++) {
+      const header = headers[i] || '';
+      const normalizedHeader = header.replace(/[\n\r]/g, '');
+      // 如果正規化後的 key 不同，也加入
+      if (normalizedHeader !== header && normalizedHeader) {
+        rowData[normalizedHeader] = valuesArray[i] ?? '';
+      }
     }
     
     // 確保姓名欄位有值（用於 getRowName）
