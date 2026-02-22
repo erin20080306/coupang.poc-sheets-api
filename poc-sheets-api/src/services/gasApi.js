@@ -360,44 +360,10 @@ export async function getSheetData(warehouse, sheetName, name = '', options = {}
       console.log(`📊 [PoC] getSheetData: ${sheetName} - 處理換行符後 headers=`, headers.slice(0, 12));
     }
     
-    // RC 出勤時數分頁：檢查是否需要合併多行表頭（最多 3 行）
+    // RC 出勤時數分頁：不再需要合併多行表頭（換行符已在 fetchSheetData 中處理）
     if (isDoubleHeaderAttendanceSheet(warehouse, sheetName)) {
-      const row1 = values[0] || [];
-      const row2 = values[1] || [];
-      const row3 = values[2] || [];
-      
-      console.log(`📊 [PoC] getSheetData: ${sheetName} - RC出勤時數 row1=`, row1);
-      console.log(`📊 [PoC] getSheetData: ${sheetName} - RC出勤時數 row2=`, row2);
-      console.log(`📊 [PoC] getSheetData: ${sheetName} - RC出勤時數 row3=`, row3);
-      
-      // 檢查第二行和第三行是否包含表頭內容
-      const isHeaderRow = (row) => row.some(cell => {
-        const s = String(cell || '');
-        return s.includes('時間') || s.includes('打卡') || s.includes('時數') || s.includes('計薪') || s.includes('實際');
-      });
-      
-      const row2IsHeader = isHeaderRow(row2);
-      const row3IsHeader = isHeaderRow(row3);
-      
-      // 決定要合併幾行
-      let headerRows = [row1];
-      if (row2IsHeader) headerRows.push(row2);
-      if (row3IsHeader) headerRows.push(row3);
-      
-      // 合併表頭，並將換行符替換為空格
-      const maxLen = Math.max(...headerRows.map(r => r.length));
-      headers = [];
-      for (let idx = 0; idx < maxLen; idx++) {
-        // 先將每個 cell 的換行符替換為空格
-        const parts = headerRows.map(r => String(r[idx] || '').replace(/[\n\r]+/g, ' ').trim()).filter(v => v);
-        // 過濾重複值
-        const uniqueParts = parts.filter((v, i, arr) => arr.indexOf(v) === i);
-        // 合併
-        const merged = uniqueParts.join(' ').trim();
-        headers.push(merged || `col_${idx + 1}`);
-      }
-      dataStartIndex = headerRows.length;
-      console.log(`📊 [PoC] getSheetData: ${sheetName} - 合併${headerRows.length}行表頭, headers=`, headers.slice(0, 12));
+      console.log(`📊 [PoC] getSheetData: ${sheetName} - RC出勤時數 headers=`, headers.slice(0, 12));
+      console.log(`📊 [PoC] getSheetData: ${sheetName} - dataStartIndex=${dataStartIndex}, 第二行=`, values[1]?.slice(0, 8));
     }
     
     // 解析日期欄位
