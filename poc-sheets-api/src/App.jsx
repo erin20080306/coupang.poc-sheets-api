@@ -575,7 +575,16 @@ const App = () => {
     // Debug: 只在第一天時輸出
     if (day === 1 && data.rows.length > 0) {
       const firstRow = data.rows[0];
-      console.log('📊 [工時月曆] 第一筆資料所有欄位:', firstRow);
+      const keys = Object.keys(firstRow);
+      console.log('📊 [工時月曆] 第一筆資料 keys:', keys);
+      console.log('📊 [工時月曆] 第一筆資料:', firstRow);
+      // 找出可能的工時欄位
+      for (const key of keys) {
+        const keyStr = String(key).replace(/[\s\n\r]/g, '');
+        if (keyStr.includes('工作') || keyStr.includes('加班') || keyStr.includes('總') || keyStr.includes('時數')) {
+          console.log(`📊 [工時月曆] 可能的工時欄位: "${key}" = "${firstRow[key]}"`);
+        }
+      }
     }
     
     // 從多筆資料中找到對應日期的資料
