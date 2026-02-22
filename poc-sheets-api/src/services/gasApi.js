@@ -44,32 +44,10 @@ async function fetchSheetData(range, warehouse = 'TAO1') {
     const data = await response.json();
     lastFetchMs = Math.round(performance.now() - startTime);
     
-    console.log(`📊 [PoC] fetchSheetData: ${wh} / ${range} - ${lastFetchMs}ms`);
+    console.log(`📊 [PoC] fetchSheetData: ${wh} / ${range} - ${lastFetchMs}ms, apiVersion=${data.apiVersion || 'old'}`);
 
     if (!data.ok) {
       throw new Error(data.error || 'API 回傳錯誤');
-    }
-
-    // 清理所有儲存格中的換行符（包括真正的換行符和 JSON 中的 \n）
-    if (Array.isArray(data.values)) {
-      data.values = data.values.map(row =>
-        Array.isArray(row) ? row.map(cell => {
-          if (typeof cell === 'string' && cell.length > 1) {
-            // 逐字元檢查，替換所有 charCode 10 (LF) 和 13 (CR)
-            let cleaned = '';
-            for (let ci = 0; ci < cell.length; ci++) {
-              const cc = cell.charCodeAt(ci);
-              cleaned += (cc === 10 || cc === 13) ? ' ' : cell[ci];
-            }
-            return cleaned.replace(/\s{2,}/g, ' ');
-          }
-          return cell;
-        }) : row
-      );
-      // Debug: 顯示第一行處理後的結果
-      if (data.values.length > 0) {
-        console.log('🔧 [fetchSheetData] 處理後第一行:', JSON.stringify(data.values[0]));
-      }
     }
 
     return data;

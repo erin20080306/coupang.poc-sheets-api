@@ -65,25 +65,36 @@ export default async function handler(req, res) {
     const rawValues = response.data.values || [];
     
     // 將所有儲存格中的換行符替換為空格
+    function cleanCell(cell) {
+      if (typeof cell !== 'string') return cell;
+      // 逐字元處理，替換 LF(10) 和 CR(13)
+      let out = '';
+      for (let i = 0; i < cell.length; i++) {
+        const c = cell.charCodeAt(i);
+        out += (c === 10 || c === 13) ? ' ' : cell.charAt(i);
+      }
+      return out.replace(/ {2,}/g, ' ');
+    }
+    
     const values = rawValues.map(row =>
-      row.map(cell => {
-        if (typeof cell === 'string') {
-          return cell.replace(/\n/g, ' ').replace(/\r/g, ' ');
-        }
-        return cell;
-      })
+      Array.isArray(row) ? row.map(cleanCell) : row
     );
     
     const rows = values.length;
     const cols = values[0]?.length || 0;
 
-    return res.status(200).json({
+    // 手動 JSON 序列化，確保不會有換行符殘留
+    const body = JSON.stringify({
       ok: true,
       range: range,
       values: values,
       meta: { rows, cols },
+      apiVersion: 'v2.1',
       serverTime: new Date().toISOString(),
     });
+    
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(200).end(body);
 
   } catch (error) {
     console.error('Sheets API Error:', error);
