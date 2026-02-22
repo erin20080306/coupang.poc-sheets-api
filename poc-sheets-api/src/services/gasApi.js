@@ -238,6 +238,16 @@ function isTao3ScheduleSheet(warehouse, sheetName) {
 }
 
 /**
+ * 判斷是否為雙行表頭的出勤時數分頁（RC 出勤時數）
+ * 這類分頁的表頭分成兩行，需要合併
+ */
+function isDoubleHeaderAttendanceSheet(warehouse, sheetName) {
+  const name = String(sheetName || '');
+  // RC 出勤時數分頁使用雙行表頭
+  return name.includes('RC') && name.includes('出勤時數');
+}
+
+/**
  * 解析表頭中的日期欄位，產生 dateCols 和 headersISO
  * 支援格式：2/1、2/14、2026/2/1、週日 2/1 等
  */
@@ -318,13 +328,30 @@ export async function getSheetData(warehouse, sheetName, name = '', options = {}
     
     // TAO3 班表類分頁：表頭在第2列（索引1），其他分頁：表頭在第1列（索引0）
     const headerRowIndex = isTao3ScheduleSheet(warehouse, sheetName) ? 1 : 0;
-    const headers = values[headerRowIndex] || [];
+    let headers = values[headerRowIndex] || [];
+    let dataStartIndex = headerRowIndex + 1;
+    
+    // RC 出勤時數分頁：表頭分成兩行，需要合併
+    if (isDoubleHeaderAttendanceSheet(warehouse, sheetName) && values.length > 1) {
+      const row1 = values[0] || [];
+      const row2 = values[1] || [];
+      // 合併兩行表頭：如果第二行有值，用換行符連接
+      headers = row1.map((h1, idx) => {
+        const h2 = row2[idx] || '';
+        if (h2 && h2 !== h1) {
+          return `${h1}\n${h2}`;
+        }
+        return h1 || '';
+      });
+      dataStartIndex = 2; // 資料從第3行開始
+      console.log(`📊 [PoC] getSheetData: ${sheetName} - 雙行表頭合併, headers=`, headers.slice(0, 10));
+    }
     
     // 解析日期欄位
     const { dateCols, headersISO } = parseDateColumns(headers, sheetName);
     
     // 轉換 rows 格式：{ v: [...], id: 'row_X' }
-    const rows = values.slice(headerRowIndex + 1).map((row, idx) => ({
+    const rows = values.slice(dataStartIndex).map((row, idx) => ({
       v: row,
       id: `row_${idx}`,
     }));
