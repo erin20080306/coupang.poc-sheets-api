@@ -641,9 +641,10 @@ const App = () => {
       
       if (rowDay !== day) continue;
       
-      // 直接遍歷所有 key 找到工時和加班欄位
+      // 直接遍歷所有 key 找到工時、加班和備註欄位
       let work = null;
       let overtime = null;
+      let note = '';
       
       for (const key of Object.keys(row)) {
         const keyStr = String(key).replace(/[\s\n\r]/g, '');
@@ -673,17 +674,24 @@ const App = () => {
             if (numMatch) overtime = parseFloat(numMatch[1]);
           }
         }
+        
+        // 匹配備註欄位
+        if (!note && (keyStr.includes('備註') || keyStr.includes('備注'))) {
+          if (val !== undefined && val !== null && val !== '') {
+            note = String(val).trim();
+          }
+        }
       }
       
       // Debug: 輸出找到的數據
       if (day === 1) {
-        console.log('📊 [工時月曆] day 1 found:', { dateVal, work, overtime });
+        console.log('📊 [工時月曆] day 1 found:', { dateVal, work, overtime, note });
       }
       
-      return { work, overtime };
+      return { work, overtime, note };
     }
     
-    return { work: null, overtime: null };
+    return { work: null, overtime: null, note: '' };
   };
 
   // 處理登入 (自動辨識倉別)
@@ -1472,12 +1480,14 @@ const App = () => {
                   {/* 當月日期 */}
                   {daysArray.map((d) => {
                     const att = getDailyAttendance(user.name, d);
-                    const hasData = att.work !== null || att.overtime !== null;
+                    const hasData = att.work !== null || att.overtime !== null || (att.note && att.note.includes('國出'));
+                    const isNationalLeave = att.note && att.note.includes('國出');
                     return (
-                      <div key={`att-${d}`} className={`aspect-square rounded flex flex-col items-center border ${hasData ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white'}`}>
-                        <span className={`${isPWA ? 'text-sm' : 'text-xl'} font-black mt-0.5 ${hasData ? 'text-blue-700' : 'text-slate-950'}`}>{d}</span>
+                      <div key={`att-${d}`} className={`aspect-square rounded flex flex-col items-center border ${isNationalLeave ? 'border-purple-200 bg-purple-50' : hasData ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white'}`}>
+                        <span className={`${isPWA ? 'text-sm' : 'text-xl'} font-black mt-0.5 ${isNationalLeave ? 'text-purple-700' : hasData ? 'text-blue-700' : 'text-slate-950'}`}>{d}</span>
                         {hasData && (
                           <div className={`${isPWA ? 'text-[8px]' : 'text-sm'} font-bold leading-tight text-center`}>
+                            {isNationalLeave && <div className="text-purple-600">國出</div>}
                             {att.work !== null && <span className="text-emerald-600">工{att.work}</span>}
                             {att.work !== null && att.overtime !== null && <span className="text-slate-400">,</span>}
                             {att.overtime !== null && <span className="text-orange-600">加{att.overtime}</span>}
