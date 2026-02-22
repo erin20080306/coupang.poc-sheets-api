@@ -1233,21 +1233,16 @@ const App = () => {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-slate-100 text-slate-500 font-bold border-b border-slate-200 text-center">
-                        {sheetData.attendance.headers.slice(0, 11).map((header, idx) => (
+                        {sheetData.attendance.headers.map((header, idx) => (
                           <th key={idx} className="px-4 py-4 whitespace-nowrap text-base">{String(header || '').replace(/\n/g, ' ')}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {sheetData.attendance.rows.slice(0, 20).map((row, idx) => {
-                        if (idx === 0) {
-                          console.log('🔍 [出勤表格] row keys:', Object.keys(row));
-                          console.log('🔍 [出勤表格] headers:', sheetData.attendance.headers.slice(0, 11));
-                          console.log('🔍 [出勤表格] row 完整資料:', row);
-                        }
+                      {sheetData.attendance.rows.map((row, idx) => {
                         return (
                         <tr key={idx} className="hover:bg-slate-50 text-center">
-                          {sheetData.attendance.headers.slice(0, 11).map((header, colIdx) => {
+                          {sheetData.attendance.headers.map((header, colIdx) => {
                             // 嘗試用表頭取值
                             let val = row[header];
                             // 如果取不到，遍歷 row 的所有 key，用清理後的 key 匹配
