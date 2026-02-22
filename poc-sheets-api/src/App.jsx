@@ -64,8 +64,9 @@ const COLOR_CONFIG = {
   "上班": { bg: "bg-white", text: "text-blue-600", border: "border-slate-100" }
 };
 
-// 登入過期時間（一天，單位：毫秒）
-const LOGIN_EXPIRY_MS = 24 * 60 * 60 * 1000;
+// 登入過期時間（單位：毫秒）
+const LOGIN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 一般用戶：1天
+const ADMIN_LOGIN_EXPIRY_MS = 3 * 24 * 60 * 60 * 1000; // 管理員：3天
 
 const App = () => {
   const [view, setView] = useState('login'); 
@@ -102,9 +103,17 @@ const App = () => {
     const isMobile = window.innerWidth < 768;
     // 只有手機 PWA 才設為 true
     setIsPWA(isStandalone && isMobile);
+    
+    // 新增：重新整理時檢查 PWA 更新
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(registration => {
+        // 重新整理時檢查更新
+        registration.update();
+      });
+    }
   }, []);
   
-  // 檢查登入是否過期（一般員工超過一天自動登出）
+  // 檢查登入是否過期（一般員工超過1天、管理員超過3天自動登出）
   useEffect(() => {
     const checkLoginExpiry = () => {
       const loginTime = localStorage.getItem('loginTime');
@@ -114,8 +123,10 @@ const App = () => {
         const elapsed = Date.now() - parseInt(loginTime, 10);
         const parsedUser = JSON.parse(savedUser);
         
-        // 管理員不受時間限制，一般員工超過一天自動登出
-        if (!parsedUser.isAdmin && elapsed > LOGIN_EXPIRY_MS) {
+        // 管理員超過3天自動登出，一般員工超過1天自動登出
+        const expiryTime = parsedUser.isAdmin ? ADMIN_LOGIN_EXPIRY_MS : LOGIN_EXPIRY_MS;
+        
+        if (elapsed > expiryTime) {
           // 登入已過期，清除資料
           localStorage.removeItem('loginTime');
           localStorage.removeItem('user');
