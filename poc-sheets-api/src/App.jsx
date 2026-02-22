@@ -267,15 +267,17 @@ const App = () => {
         const type = classifySheet(sheetName);
         const parsed = parseSheetData(raw);
         
-        // 將表頭中的換行符替換為空格（支援 \n, \r, 以及字面上的 \n 字串）
+        // 將表頭中的換行符替換為空格（支援實際換行符和字面上的 \n 字串）
         if (parsed.headers) {
           parsed.headers = parsed.headers.map(h => {
             let s = String(h || '');
-            // 替換實際的換行符
+            // 替換實際的換行符和回車符
             s = s.replace(/\n/g, ' ').replace(/\r/g, ' ');
-            // 替換字面上的 \n 字串（例如 "上班\n時間"）
-            s = s.replace(/\\n/g, ' ');
-            return s.trim();
+            // 替換字面上的反斜線n字串
+            s = s.split('\\n').join(' ');
+            // 清理多餘空格
+            s = s.replace(/\s+/g, ' ').trim();
+            return s;
           });
         }
         
