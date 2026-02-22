@@ -1234,11 +1234,18 @@ const App = () => {
                       {sheetData.attendance.rows.slice(0, 20).map((row, idx) => (
                         <tr key={idx} className="hover:bg-slate-50 text-center">
                           {sheetData.attendance.headers.slice(0, 11).map((header, colIdx) => {
-                            // 嘗試用原始表頭取值，如果失敗則用正規化的表頭
+                            // 嘗試用表頭取值
                             let val = row[header];
+                            // 如果取不到，遍歷 row 的所有 key，用清理後的 key 匹配
                             if (val === undefined || val === '') {
-                              const normalizedHeader = String(header || '').replace(/[\n\r]/g, '');
-                              val = row[normalizedHeader];
+                              const cleanHeader = String(header || '').replace(/[\s\n\r]+/g, '');
+                              for (const key of Object.keys(row)) {
+                                const cleanKey = String(key).replace(/[\s\n\r]+/g, '');
+                                if (cleanKey === cleanHeader && cleanHeader !== '') {
+                                  val = row[key];
+                                  break;
+                                }
+                              }
                             }
                             return (
                               <td key={colIdx} className="px-4 py-4 whitespace-nowrap text-base">
