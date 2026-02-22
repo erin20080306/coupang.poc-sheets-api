@@ -598,11 +598,25 @@ const App = () => {
     // Debug: 只在第一天時輸出
     if (day === 1) {
       console.log('📊 [工時月曆] headers:', headers);
+      console.log('📊 [工時月曆] headers.length:', headers.length);
       console.log('📊 [工時月曆] dateIdx:', dateIdx, 'workIdx:', workIdx, 'overtimeIdx:', overtimeIdx);
-      // 輸出第一筆資料的所有 key
+      // 輸出第一筆資料的所有 key 和值
       if (data.rows.length > 0) {
-        console.log('📊 [工時月曆] 第一筆資料 keys:', Object.keys(data.rows[0]));
-        console.log('📊 [工時月曆] 第一筆資料:', data.rows[0]);
+        const firstRow = data.rows[0];
+        const keys = Object.keys(firstRow);
+        console.log('📊 [工時月曆] 第一筆資料 keys.length:', keys.length);
+        console.log('📊 [工時月曆] 第一筆資料 keys:', keys);
+        // 檢查工時欄位的值
+        if (workIdx >= 0) {
+          const workHeader = headers[workIdx];
+          console.log('📊 [工時月曆] workHeader:', JSON.stringify(workHeader));
+          console.log('📊 [工時月曆] firstRow[workHeader]:', firstRow[workHeader]);
+        }
+        if (overtimeIdx >= 0) {
+          const overtimeHeader = headers[overtimeIdx];
+          console.log('📊 [工時月曆] overtimeHeader:', JSON.stringify(overtimeHeader));
+          console.log('📊 [工時月曆] firstRow[overtimeHeader]:', firstRow[overtimeHeader]);
+        }
       }
     }
     
