@@ -556,7 +556,7 @@ const App = () => {
   };
 
   // 獲取每日工時數據（從出勤時數分頁）
-  // 依照表頭含「日期」、「工作總時數」、「加班總時數」文字的欄位導入
+  // 依照表頭含「日期」、「工作」+「總時數」、「加班」+「總時數」文字的欄位導入
   const getDailyAttendance = (name, day) => {
     const data = sheetData.attendance;
     if (!data?.rows?.length || !data?.headers?.length) return { work: null, overtime: null };
@@ -568,7 +568,7 @@ const App = () => {
     let overtimeHeader = null;
     
     for (const h of headers) {
-      const hStr = String(h || '').replace(/\s+/g, ''); // 移除所有空白和換行
+      const hStr = String(h || '').replace(/[\s\n\r]/g, ''); // 移除所有空白和換行
       if (hStr.includes('日期') && !dateHeader) dateHeader = h;
       if ((hStr.includes('工作') && hStr.includes('總時數')) && !workHeader) workHeader = h;
       if ((hStr.includes('加班') && hStr.includes('總時數')) && !overtimeHeader) overtimeHeader = h;
@@ -576,13 +576,7 @@ const App = () => {
     
     // Debug: 只在第一天時輸出
     if (day === 1) {
-      console.log('📊 [工時月曆] headers 完整:', headers.join(', '));
       console.log('📊 [工時月曆] dateHeader:', dateHeader, 'workHeader:', workHeader, 'overtimeHeader:', overtimeHeader);
-      console.log('📊 [工時月曆] rows count:', data.rows.length);
-      if (data.rows.length > 0) {
-        console.log('📊 [工時月曆] first row keys:', Object.keys(data.rows[0]).join(', '));
-        console.log('📊 [工時月曆] first row values:', Object.values(data.rows[0]).slice(0, 15).join(', '));
-      }
     }
     
     if (!dateHeader) return { work: null, overtime: null };
@@ -593,18 +587,18 @@ const App = () => {
       const dateVal = row[dateHeader];
       if (!dateVal) continue;
       
-      // 解析日期，取得日
+      // 解析日期，取得日（支援 2026/02/03 格式）
       const dateStr = String(dateVal);
-      // 支援多種日期格式：2/1, 2-1, 2026/2/1, 2026-2-1, 1日
+      // 支援多種日期格式：2026/02/03, 2026-02-03, 2/3, 2-3, 3日
       const fullMatch = dateStr.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
-      const shortMatch = dateStr.match(/(\d{1,2})[\/\-](\d{1,2})/);
+      const shortMatch = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})$/);
       const dayOnlyMatch = dateStr.match(/(\d{1,2})日/);
       
       let rowDay;
       if (fullMatch) {
-        rowDay = parseInt(fullMatch[3], 10); // YYYY/MM/DD 格式，取第三個數字
+        rowDay = parseInt(fullMatch[3], 10); // YYYY/MM/DD 格式，取第三個數字（日）
       } else if (shortMatch) {
-        rowDay = parseInt(shortMatch[2], 10); // MM/DD 格式，取第二個數字
+        rowDay = parseInt(shortMatch[2], 10); // MM/DD 格式，取第二個數字（日）
       } else if (dayOnlyMatch) {
         rowDay = parseInt(dayOnlyMatch[1], 10); // DD日 格式
       } else {
@@ -620,7 +614,7 @@ const App = () => {
       if (workHeader) {
         const workVal = row[workHeader];
         if (workVal !== undefined && workVal !== null && workVal !== '') {
-          const val = String(workVal);
+          const val = String(workVal).trim();
           const numMatch = val.match(/(\d+\.?\d*)/);
           if (numMatch) work = parseFloat(numMatch[1]);
         }
@@ -629,15 +623,15 @@ const App = () => {
       if (overtimeHeader) {
         const overtimeVal = row[overtimeHeader];
         if (overtimeVal !== undefined && overtimeVal !== null && overtimeVal !== '') {
-          const val = String(overtimeVal);
+          const val = String(overtimeVal).trim();
           const numMatch = val.match(/(\d+\.?\d*)/);
           if (numMatch) overtime = parseFloat(numMatch[1]);
         }
       }
       
       // Debug: 輸出找到的數據
-      if (day === 1) {
-        console.log('📊 [工時月曆] day 1 found:', { dateVal, work, overtime });
+      if (day === 3) {
+        console.log('📊 [工時月曆] day 3 found:', { dateVal, workHeader, workVal: row[workHeader], overtimeHeader, overtimeVal: row[overtimeHeader], work, overtime });
       }
       
       return { work, overtime };
