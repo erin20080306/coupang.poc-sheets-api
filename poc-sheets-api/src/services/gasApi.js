@@ -331,25 +331,13 @@ export async function getSheetData(warehouse, sheetName, name = '', options = {}
     let headers = values[headerRowIndex] || [];
     let dataStartIndex = headerRowIndex + 1;
     
-    // RC 出勤時數分頁：表頭分成三行，需要合併
-    if (isDoubleHeaderAttendanceSheet(warehouse, sheetName) && values.length > 2) {
-      const row1 = values[0] || [];
-      const row2 = values[1] || [];
-      const row3 = values[2] || [];
-      // 找出最長的行來決定欄位數量
-      const maxLen = Math.max(row1.length, row2.length, row3.length);
-      // 合併三行表頭：用換行符連接非空值
-      headers = [];
-      for (let idx = 0; idx < maxLen; idx++) {
-        const h1 = String(row1[idx] || '').trim();
-        const h2 = String(row2[idx] || '').trim();
-        const h3 = String(row3[idx] || '').trim();
-        // 過濾掉空值和重複值，用換行符連接
-        const parts = [h1, h2, h3].filter((v, i, arr) => v && arr.indexOf(v) === i);
-        headers.push(parts.join('\n') || `col_${idx + 1}`);
-      }
-      dataStartIndex = 3; // 資料從第4行開始
-      console.log(`📊 [PoC] getSheetData: ${sheetName} - 三行表頭合併, headers=`, headers.slice(0, 12));
+    // RC 出勤時數分頁：表頭在第1行（儲存格內有換行符），資料從第2行開始
+    // 不需要特殊處理，使用預設邏輯即可
+    if (isDoubleHeaderAttendanceSheet(warehouse, sheetName)) {
+      // 表頭在第1行（索引0），資料從第2行開始（索引1）
+      headers = values[0] || [];
+      dataStartIndex = 1;
+      console.log(`📊 [PoC] getSheetData: ${sheetName} - RC出勤時數, headers=`, headers.slice(0, 12));
     }
     
     // 解析日期欄位
