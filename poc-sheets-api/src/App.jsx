@@ -1230,7 +1230,7 @@ const App = () => {
               <div ref={attendanceRef} className="bg-white overflow-x-auto">
                 <div className="text-center py-3 text-sm font-bold text-slate-600">{user.name} - {year}年{selectedMonth}月 工時明細</div>
                 {(
-                  <table className="w-full text-sm">
+                  <table className="min-w-max text-sm">
                     <thead>
                       <tr className="bg-slate-100 text-slate-500 font-bold border-b border-slate-200 text-center">
                         {sheetData.attendance.headers.map((header, idx) => (
