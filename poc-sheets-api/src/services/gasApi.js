@@ -328,7 +328,8 @@ export async function getSheetData(warehouse, sheetName, name = '', options = {}
     
     // TAO3 班表類分頁：表頭在第2列（索引1），其他分頁：表頭在第1列（索引0）
     const headerRowIndex = isTao3ScheduleSheet(warehouse, sheetName) ? 1 : 0;
-    let headers = values[headerRowIndex] || [];
+    // 將表頭中的換行符替換為空格
+    let headers = (values[headerRowIndex] || []).map(h => String(h || '').replace(/[\n\r]+/g, ' ').trim());
     let dataStartIndex = headerRowIndex + 1;
     
     // RC 出勤時數分頁：檢查是否需要合併多行表頭（最多 3 行）
@@ -355,14 +356,16 @@ export async function getSheetData(warehouse, sheetName, name = '', options = {}
       if (row2IsHeader) headerRows.push(row2);
       if (row3IsHeader) headerRows.push(row3);
       
-      // 合併表頭
+      // 合併表頭，並將換行符替換為空格
       const maxLen = Math.max(...headerRows.map(r => r.length));
       headers = [];
       for (let idx = 0; idx < maxLen; idx++) {
         const parts = headerRows.map(r => String(r[idx] || '').trim()).filter(v => v);
         // 過濾重複值
         const uniqueParts = parts.filter((v, i, arr) => arr.indexOf(v) === i);
-        headers.push(uniqueParts.join('\n') || `col_${idx + 1}`);
+        // 合併並將換行符替換為空格
+        const merged = uniqueParts.join(' ').replace(/[\n\r]+/g, ' ').trim();
+        headers.push(merged || `col_${idx + 1}`);
       }
       dataStartIndex = headerRows.length;
       console.log(`📊 [PoC] getSheetData: ${sheetName} - 合併${headerRows.length}行表頭, headers=`, headers.slice(0, 12));
