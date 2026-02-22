@@ -12,9 +12,9 @@
   <body>
     <div id="root"></div>
     <script>
-      // v2.3 強制清除所有 SW 快取
-      if (localStorage.getItem('_cv') !== '2.3') {
-        localStorage.setItem('_cv', '2.3');
+      // v2.4 強制清除所有 SW 快取
+      if (localStorage.getItem('_cv') !== '2.4') {
+        localStorage.setItem('_cv', '2.4');
         if ('caches' in window) caches.keys().then(function(n){n.forEach(function(k){caches.delete(k)})});
         if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(s){s.unregister()})});
         if (localStorage.getItem('_cv_prev')) location.reload();

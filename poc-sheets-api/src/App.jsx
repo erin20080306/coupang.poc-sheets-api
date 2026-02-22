@@ -1117,7 +1117,12 @@ const App = () => {
               </div>
             </section>
           )}
-          {activeTab === 'calendar' && !loading && (
+          {activeTab === 'calendar' && !loading && sheetData.schedule.rows.length === 0 && (
+            <div className="bg-slate-100 border border-slate-200 rounded-2xl p-8 text-center">
+              <p className="text-slate-500 font-bold text-lg">📅 {selectedMonth}月本月系統無資料或已刪除</p>
+            </div>
+          )}
+          {activeTab === 'calendar' && !loading && sheetData.schedule.rows.length > 0 && (
             <section className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 overflow-hidden">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -1273,7 +1278,12 @@ const App = () => {
           ))}
 
           {/* 3. 假別統計 */}
-          {activeTab === 'leaves' && (
+          {activeTab === 'leaves' && sheetData.schedule.rows.length === 0 && (
+            <div className="bg-slate-100 border border-slate-200 rounded-2xl p-8 text-center">
+              <p className="text-slate-500 font-bold text-lg">📊 {selectedMonth}月本月系統無資料或已刪除</p>
+            </div>
+          )}
+          {activeTab === 'leaves' && sheetData.schedule.rows.length > 0 && (
             <section className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
               <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                 <div className="flex items-center gap-3">
@@ -1397,6 +1407,11 @@ const App = () => {
           ))}
 
           {/* 5. 調假名單 - 只有 TAO1 倉顯示，沒有資料時不顯示 */}
+          {activeTab === 'adjustment' && user.warehouse === 'TAO1' && sheetData.adjustment.rows.length === 0 && (
+            <div className="bg-slate-100 border border-slate-200 rounded-2xl p-8 text-center">
+              <p className="text-slate-500 font-bold text-lg">📝 {selectedMonth}月本月系統無資料或已刪除</p>
+            </div>
+          )}
           {activeTab === 'adjustment' && user.warehouse === 'TAO1' && sheetData.adjustment.rows.length > 0 && (
             <section className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
               <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-800">
