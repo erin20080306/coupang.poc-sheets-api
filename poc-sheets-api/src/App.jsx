@@ -609,8 +609,6 @@ const App = () => {
     if (dateIdx < 0) return { work: null, overtime: null };
     
     const dateHeader = headers[dateIdx];
-    const workHeader = workIdx >= 0 ? headers[workIdx] : null;
-    const overtimeHeader = overtimeIdx >= 0 ? headers[overtimeIdx] : null;
     
     // 從多筆資料中找到對應日期的資料
     for (const row of data.rows) {
@@ -638,12 +636,24 @@ const App = () => {
       
       if (rowDay !== day) continue;
       
-      // 取得工作總時數和加班總時數
+      // 取得工作總時數和加班總時數（直接用索引從 row 物件取值）
       let work = null;
       let overtime = null;
       
-      if (workHeader) {
-        const workVal = row[workHeader];
+      // 嘗試用表頭名稱取值，如果失敗則遍歷所有 key
+      if (workIdx >= 0) {
+        const workHeader = headers[workIdx];
+        let workVal = row[workHeader];
+        // 如果用表頭名稱取不到值，嘗試遍歷所有 key 找到匹配的
+        if (workVal === undefined || workVal === '') {
+          for (const key of Object.keys(row)) {
+            const keyStr = String(key).replace(/[\s\n\r]/g, '');
+            if (keyStr.includes('工作') && (keyStr.includes('總時數') || keyStr.includes('計薪工時'))) {
+              workVal = row[key];
+              break;
+            }
+          }
+        }
         if (workVal !== undefined && workVal !== null && workVal !== '') {
           const val = String(workVal).trim();
           const numMatch = val.match(/(\d+\.?\d*)/);
@@ -651,8 +661,19 @@ const App = () => {
         }
       }
       
-      if (overtimeHeader) {
-        const overtimeVal = row[overtimeHeader];
+      if (overtimeIdx >= 0) {
+        const overtimeHeader = headers[overtimeIdx];
+        let overtimeVal = row[overtimeHeader];
+        // 如果用表頭名稱取不到值，嘗試遍歷所有 key 找到匹配的
+        if (overtimeVal === undefined || overtimeVal === '') {
+          for (const key of Object.keys(row)) {
+            const keyStr = String(key).replace(/[\s\n\r]/g, '');
+            if (keyStr.includes('加班') && (keyStr.includes('總時數') || keyStr.includes('計薪工時'))) {
+              overtimeVal = row[key];
+              break;
+            }
+          }
+        }
         if (overtimeVal !== undefined && overtimeVal !== null && overtimeVal !== '') {
           const val = String(overtimeVal).trim();
           const numMatch = val.match(/(\d+\.?\d*)/);
@@ -662,7 +683,7 @@ const App = () => {
       
       // Debug: 輸出找到的數據
       if (day === 1) {
-        console.log('📊 [工時月曆] day 1 found:', { dateVal, workHeader, workVal: row[workHeader], overtimeHeader, overtimeVal: row[overtimeHeader], work, overtime });
+        console.log('📊 [工時月曆] day 1 found:', { dateVal, work, overtime, rowKeys: Object.keys(row) });
       }
       
       return { work, overtime };
