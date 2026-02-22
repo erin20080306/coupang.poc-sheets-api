@@ -619,16 +619,25 @@ const App = () => {
         const keyStr = String(key).replace(/[\s\n\r]/g, '');
         const val = row[key];
         
-        // 匹配工時欄位：包含「工作」且包含「總時數」或「計薪工時」
-        if (work === null && keyStr.includes('工作') && (keyStr.includes('總時數') || keyStr.includes('計薪工時'))) {
+        // 匹配工時欄位：包含「工作」或「工作總」或「計薪工時」
+        if (work === null && (
+          keyStr.includes('工作總') ||
+          keyStr.includes('計薪工時') ||
+          (keyStr.includes('工作') && keyStr.includes('總時數')) ||
+          (keyStr.includes('工作') && keyStr.includes('時數'))
+        )) {
           if (val !== undefined && val !== null && val !== '') {
             const numMatch = String(val).trim().match(/(\d+\.?\d*)/);
             if (numMatch) work = parseFloat(numMatch[1]);
           }
         }
         
-        // 匹配加班欄位：包含「加班」且包含「總時數」或「計薪工時」
-        if (overtime === null && keyStr.includes('加班') && (keyStr.includes('總時數') || keyStr.includes('計薪工時'))) {
+        // 匹配加班欄位：包含「加班」或「加班總」
+        if (overtime === null && (
+          keyStr.includes('加班總') ||
+          (keyStr.includes('加班') && keyStr.includes('總時數')) ||
+          (keyStr.includes('加班') && keyStr.includes('時數'))
+        )) {
           if (val !== undefined && val !== null && val !== '') {
             const numMatch = String(val).trim().match(/(\d+\.?\d*)/);
             if (numMatch) overtime = parseFloat(numMatch[1]);
@@ -1187,18 +1196,26 @@ const App = () => {
                     <thead>
                       <tr className="bg-slate-100 text-slate-500 font-bold border-b border-slate-200 text-center">
                         {sheetData.attendance.headers.slice(0, 11).map((header, idx) => (
-                          <th key={idx} className="px-4 py-4 whitespace-nowrap text-base">{header}</th>
+                          <th key={idx} className="px-4 py-4 whitespace-nowrap text-base">{String(header || '').replace(/\n/g, ' ')}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {sheetData.attendance.rows.slice(0, 20).map((row, idx) => (
                         <tr key={idx} className="hover:bg-slate-50 text-center">
-                          {sheetData.attendance.headers.slice(0, 11).map((header, colIdx) => (
-                            <td key={colIdx} className="px-4 py-4 whitespace-nowrap text-base">
-                              {String(row[header] || '')}
-                            </td>
-                          ))}
+                          {sheetData.attendance.headers.slice(0, 11).map((header, colIdx) => {
+                            // 嘗試用原始表頭取值，如果失敗則用正規化的表頭
+                            let val = row[header];
+                            if (val === undefined || val === '') {
+                              const normalizedHeader = String(header || '').replace(/[\n\r]/g, '');
+                              val = row[normalizedHeader];
+                            }
+                            return (
+                              <td key={colIdx} className="px-4 py-4 whitespace-nowrap text-base">
+                                {String(val || '')}
+                              </td>
+                            );
+                          })}
                         </tr>
                       ))}
                     </tbody>
