@@ -43,8 +43,22 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
+        // 不要預快取 index.html，讓它每次都從網路取得
+        navigateFallback: null,
         runtimeCaching: [
+          {
+            // HTML 頁面：優先從網路取得
+            urlPattern: /\/$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'html-cache',
+              expiration: {
+                maxEntries: 5,
+                maxAgeSeconds: 60 * 10
+              }
+            }
+          },
           {
             urlPattern: /^https:\/\/script\.google\.com\/.*/i,
             handler: 'NetworkFirst',
