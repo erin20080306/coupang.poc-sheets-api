@@ -11,6 +11,16 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // v2.3 強制清除所有 SW 快取
+      if (localStorage.getItem('_cv') !== '2.3') {
+        localStorage.setItem('_cv', '2.3');
+        if ('caches' in window) caches.keys().then(function(n){n.forEach(function(k){caches.delete(k)})});
+        if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(s){s.unregister()})});
+        if (localStorage.getItem('_cv_prev')) location.reload();
+        localStorage.setItem('_cv_prev', '1');
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
