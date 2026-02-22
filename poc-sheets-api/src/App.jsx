@@ -1496,7 +1496,7 @@ const App = () => {
                       <div key={`att-${d}`} className={`aspect-square rounded flex flex-col items-center border ${isNationalLeave ? 'border-purple-200 bg-purple-50' : hasData ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white'}`}>
                         <span className={`${isPWA ? 'text-sm' : 'text-xl'} font-black mt-0.5 ${isNationalLeave ? 'text-purple-700' : hasData ? 'text-blue-700' : 'text-slate-950'}`}>{d}</span>
                         {hasData && (
-                          <div className={`${isPWA ? 'text-[8px]' : 'text-sm'} font-bold leading-tight text-center`}>
+                          <div className={`${isPWA ? 'text-[10px]' : 'text-sm'} font-bold leading-tight text-center`}>
                             {isNationalLeave && <div className="text-purple-600">國出</div>}
                             {att.work !== null && <span className="text-emerald-600">工{att.work}</span>}
                             {att.work !== null && att.overtime !== null && <span className="text-slate-400">,</span>}
