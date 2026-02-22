@@ -449,7 +449,8 @@ function findNameColumnIndex(headers) {
  * 解析分頁資料為標準格式
  */
 export function parseSheetData(rawData, options = {}) {
-  const headers = (rawData.headers ?? []).map(h => String(h ?? ''));
+  // 將表頭中的換行符替換為空格，確保資料能正確匹配
+  const headers = (rawData.headers ?? []).map(h => String(h ?? '').replace(/[\n\r]+/g, ' ').trim());
   
   // 找出姓名欄位索引
   const nameColIndex = findNameColumnIndex(headers);
