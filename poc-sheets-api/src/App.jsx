@@ -599,6 +599,11 @@ const App = () => {
     if (day === 1) {
       console.log('📊 [工時月曆] headers:', headers);
       console.log('📊 [工時月曆] dateIdx:', dateIdx, 'workIdx:', workIdx, 'overtimeIdx:', overtimeIdx);
+      // 輸出第一筆資料的所有 key
+      if (data.rows.length > 0) {
+        console.log('📊 [工時月曆] 第一筆資料 keys:', Object.keys(data.rows[0]));
+        console.log('📊 [工時月曆] 第一筆資料:', data.rows[0]);
+      }
     }
     
     if (dateIdx < 0) return { work: null, overtime: null };
