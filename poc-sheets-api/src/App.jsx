@@ -1383,23 +1383,23 @@ const App = () => {
         {/* 工時月曆版彈窗 */}
         {showAttendanceCalendar && (
           <div className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-lg flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl">
+            <div className={`bg-white w-full ${isPWA ? 'max-w-md' : 'max-w-2xl'} rounded-3xl overflow-hidden shadow-2xl`}>
               <div className="px-6 py-4 bg-slate-50 border-b flex items-center justify-between">
-                <h3 className="text-lg font-black text-slate-900">📅 工時月曆版</h3>
+                <h3 className={`${isPWA ? 'text-lg' : 'text-2xl'} font-black text-slate-900`}>📅 工時月曆版</h3>
                 <button onClick={() => setShowAttendanceCalendar(false)} className="p-2 bg-white shadow border border-slate-200 rounded-xl text-slate-400 hover:text-red-500">
                   <X size={20}/>
                 </button>
               </div>
-              <div className="p-4 bg-white">
-                <div className="text-center mb-3 text-sm font-bold text-slate-600">{user.name} - {year}年{selectedMonth}月 工時月曆</div>
-                <div className="grid grid-cols-7 gap-1">
+              <div className={`${isPWA ? 'p-4' : 'p-6'} bg-white`}>
+                <div className={`text-center mb-3 ${isPWA ? 'text-sm' : 'text-lg'} font-bold text-slate-600`}>{user.name} - {year}年{selectedMonth}月 工時月曆</div>
+                <div className={`grid grid-cols-7 ${isPWA ? 'gap-1' : 'gap-2'}`}>
                   {['日','一','二','三','四','五','六'].map(w => (
-                    <div key={w} className="text-center text-xs font-bold text-slate-400 py-1">{w}</div>
+                    <div key={w} className={`text-center ${isPWA ? 'text-xs' : 'text-base'} font-bold text-slate-400 py-1`}>{w}</div>
                   ))}
                   {/* 上個月跨月日期 */}
                   {prevMonthDates.map((d) => (
                     <div key={`att-prev-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50">
-                      <span className="text-sm font-bold text-slate-300 mt-0.5">{d}</span>
+                      <span className={`${isPWA ? 'text-sm' : 'text-xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
                     </div>
                   ))}
                   {/* 當月日期 */}
@@ -1408,9 +1408,9 @@ const App = () => {
                     const hasData = att.work !== null || att.overtime !== null;
                     return (
                       <div key={`att-${d}`} className={`aspect-square rounded flex flex-col items-center border ${hasData ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white'}`}>
-                        <span className={`text-sm font-black mt-0.5 ${hasData ? 'text-blue-700' : 'text-slate-950'}`}>{d}</span>
+                        <span className={`${isPWA ? 'text-sm' : 'text-xl'} font-black mt-0.5 ${hasData ? 'text-blue-700' : 'text-slate-950'}`}>{d}</span>
                         {hasData && (
-                          <div className="text-[8px] font-bold leading-tight text-center">
+                          <div className={`${isPWA ? 'text-[8px]' : 'text-sm'} font-bold leading-tight text-center`}>
                             {att.work !== null && <span className="text-emerald-600">工{att.work}</span>}
                             {att.work !== null && att.overtime !== null && <span className="text-slate-400">,</span>}
                             {att.overtime !== null && <span className="text-orange-600">加{att.overtime}</span>}
@@ -1422,11 +1422,11 @@ const App = () => {
                   {/* 下個月跨月日期 */}
                   {nextMonthDates.map((d) => (
                     <div key={`att-next-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50">
-                      <span className="text-sm font-bold text-slate-300 mt-0.5">{d}</span>
+                      <span className={`${isPWA ? 'text-sm' : 'text-xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-slate-400 mt-3 text-center">所有資料為酷澎提供系統匯入</p>
+                <p className={`${isPWA ? 'text-xs' : 'text-sm'} text-slate-400 mt-3 text-center`}>所有資料為酷澎提供系統匯入</p>
               </div>
             </div>
           </div>
