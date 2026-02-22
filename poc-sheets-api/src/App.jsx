@@ -1083,16 +1083,16 @@ const App = () => {
                 </div>
               </div>
               <p className="text-xs text-slate-400 mb-4">所有資料為酷澎提供系統匯入</p>
-              <div ref={calendarRef} className="bg-white p-4">
-                <div className="text-center mb-2 text-sm font-bold text-slate-600">{user.name} - {year}年{selectedMonth}月 班表</div>
-                <div className="grid grid-cols-7 gap-1">
+              <div ref={calendarRef} className={`bg-white ${isPWA ? 'p-4' : 'p-6'}`}>
+                <div className={`text-center mb-2 ${isPWA ? 'text-sm' : 'text-lg'} font-bold text-slate-600`}>{user.name} - {year}年{selectedMonth}月 班表</div>
+                <div className={`grid grid-cols-7 ${isPWA ? 'gap-1' : 'gap-2'}`}>
                   {['日','一','二','三','四','五','六'].map(w => (
-                    <div key={w} className="text-center text-xs font-bold text-slate-400 py-1">{w}</div>
+                    <div key={w} className={`text-center ${isPWA ? 'text-xs' : 'text-base'} font-bold text-slate-400 py-1`}>{w}</div>
                   ))}
                   {/* 上個月跨月日期 */}
                   {prevMonthDates.map((d) => (
                     <div key={`prev-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50">
-                      <span className="text-lg font-bold text-slate-300 mt-0.5">{d}</span>
+                      <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
                     </div>
                   ))}
                   {/* 當月日期 */}
@@ -1110,8 +1110,8 @@ const App = () => {
                       const hasStatus = isLeave && displayStatus;
                       return (
                         <div key={d} className={`aspect-square rounded flex flex-col items-center border ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
-                          <span className={`text-lg font-black mt-0.5 ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
-                          {hasStatus && <span className={`text-[9px] font-bold ${config.text}`}>{displayStatus}</span>}
+                          <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-black mt-0.5 ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
+                          {hasStatus && <span className={`${isPWA ? 'text-[9px]' : 'text-sm'} font-bold ${config.text}`}>{displayStatus}</span>}
                         </div>
                       );
                     }
@@ -1120,15 +1120,15 @@ const App = () => {
                     const displayStatus = isLeave ? status : '';
                     return (
                       <div key={d} className={`aspect-square rounded flex flex-col items-center border ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
-                        <span className={`text-lg font-black mt-0.5 ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
-                        {displayStatus && <span className={`text-[9px] font-bold ${isInLeaveMap ? config.text : 'text-slate-600'}`}>{displayStatus}</span>}
+                        <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-black mt-0.5 ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
+                        {displayStatus && <span className={`${isPWA ? 'text-[9px]' : 'text-sm'} font-bold ${isInLeaveMap ? config.text : 'text-slate-600'}`}>{displayStatus}</span>}
                       </div>
                     );
                   })}
                   {/* 下個月跨月日期 */}
                   {nextMonthDates.map((d) => (
                     <div key={`next-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50">
-                      <span className="text-lg font-bold text-slate-300 mt-0.5">{d}</span>
+                      <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
                     </div>
                   ))}
                 </div>
@@ -1285,11 +1285,11 @@ const App = () => {
                 </div>
               </div>
               <p className="text-xs text-slate-400 px-6 mt-2">所有資料為酷澎提供系統匯入</p>
-              <div ref={recordsCalendarRef} className="bg-white p-2">
-                <div className="text-center mb-3 text-sm font-bold text-slate-600">{user.name} - {year}年{selectedMonth}月 出勤記錄</div>
-                <div className="grid grid-cols-7 gap-2">
+              <div ref={recordsCalendarRef} className={`bg-white ${isPWA ? 'p-2' : 'p-6'}`}>
+                <div className={`text-center mb-3 ${isPWA ? 'text-sm' : 'text-lg'} font-bold text-slate-600`}>{user.name} - {year}年{selectedMonth}月 出勤記錄</div>
+                <div className={`grid grid-cols-7 ${isPWA ? 'gap-2' : 'gap-3'}`}>
                 {['日','一','二','三','四','五','六'].map(w => (
-                  <div key={w} className="text-center text-xs font-bold text-slate-400 py-1">{w}</div>
+                  <div key={w} className={`text-center ${isPWA ? 'text-xs' : 'text-base'} font-bold text-slate-400 py-1`}>{w}</div>
                 ))}
                 {/* 上個月跨月日期 */}
                 {prevMonthDates.map((d) => (
