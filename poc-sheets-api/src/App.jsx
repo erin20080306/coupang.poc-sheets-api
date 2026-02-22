@@ -267,9 +267,16 @@ const App = () => {
         const type = classifySheet(sheetName);
         const parsed = parseSheetData(raw);
         
-        // 將表頭中的換行符替換為空格
+        // 將表頭中的換行符替換為空格（支援 \n, \r, 以及字面上的 \n 字串）
         if (parsed.headers) {
-          parsed.headers = parsed.headers.map(h => String(h || '').replace(/[\n\r]+/g, ' ').trim());
+          parsed.headers = parsed.headers.map(h => {
+            let s = String(h || '');
+            // 替換實際的換行符
+            s = s.replace(/\n/g, ' ').replace(/\r/g, ' ');
+            // 替換字面上的 \n 字串（例如 "上班\n時間"）
+            s = s.replace(/\\n/g, ' ');
+            return s.trim();
+          });
         }
         
         // Debug: 顯示解析後的資料
