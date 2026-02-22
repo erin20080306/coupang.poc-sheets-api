@@ -574,6 +574,16 @@ const App = () => {
       if (hStr.includes('加班總時數') && !overtimeHeader) overtimeHeader = h;
     }
     
+    // Debug: 只在第一天時輸出
+    if (day === 1) {
+      console.log('📊 [工時月曆] headers:', headers.slice(0, 15));
+      console.log('📊 [工時月曆] dateHeader:', dateHeader, 'workHeader:', workHeader, 'overtimeHeader:', overtimeHeader);
+      console.log('📊 [工時月曆] rows count:', data.rows.length);
+      if (data.rows.length > 0) {
+        console.log('📊 [工時月曆] first row:', data.rows[0]);
+      }
+    }
+    
     if (!dateHeader) return { work: null, overtime: null };
     
     // 從多筆資料中找到對應日期的資料
@@ -584,15 +594,20 @@ const App = () => {
       
       // 解析日期，取得日
       const dateStr = String(dateVal);
-      const match = dateStr.match(/(\d{1,2})[\/\-](\d{1,2})/) || dateStr.match(/(\d{1,2})日/);
-      if (!match) continue;
+      // 支援多種日期格式：2/1, 2-1, 2026/2/1, 2026-2-1, 1日
+      const fullMatch = dateStr.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+      const shortMatch = dateStr.match(/(\d{1,2})[\/\-](\d{1,2})/);
+      const dayOnlyMatch = dateStr.match(/(\d{1,2})日/);
       
-      // 判斷是 MM/DD 還是 DD 格式
       let rowDay;
-      if (match[2]) {
-        rowDay = parseInt(match[2], 10); // MM/DD 格式，取第二個數字
+      if (fullMatch) {
+        rowDay = parseInt(fullMatch[3], 10); // YYYY/MM/DD 格式，取第三個數字
+      } else if (shortMatch) {
+        rowDay = parseInt(shortMatch[2], 10); // MM/DD 格式，取第二個數字
+      } else if (dayOnlyMatch) {
+        rowDay = parseInt(dayOnlyMatch[1], 10); // DD日 格式
       } else {
-        rowDay = parseInt(match[1], 10); // DD 格式
+        continue;
       }
       
       if (rowDay !== day) continue;
@@ -619,9 +634,12 @@ const App = () => {
         }
       }
       
-      if (work !== null || overtime !== null) {
-        return { work, overtime };
+      // Debug: 輸出找到的數據
+      if (day === 1) {
+        console.log('📊 [工時月曆] day 1 found:', { dateVal, work, overtime });
       }
+      
+      return { work, overtime };
     }
     
     return { work: null, overtime: null };
