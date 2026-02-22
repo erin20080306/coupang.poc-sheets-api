@@ -62,7 +62,18 @@ export default async function handler(req, res) {
       majorDimension: majorDimension,
     });
 
-    const values = response.data.values || [];
+    const rawValues = response.data.values || [];
+    
+    // 將所有儲存格中的換行符替換為空格
+    const values = rawValues.map(row =>
+      row.map(cell => {
+        if (typeof cell === 'string') {
+          return cell.replace(/\n/g, ' ').replace(/\r/g, ' ');
+        }
+        return cell;
+      })
+    );
+    
     const rows = values.length;
     const cols = values[0]?.length || 0;
 
