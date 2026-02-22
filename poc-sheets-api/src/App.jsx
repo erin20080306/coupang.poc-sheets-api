@@ -556,100 +556,75 @@ const App = () => {
   };
 
   // 獲取每日工時數據（從出勤時數分頁）
-  // 欄位格式：「工7」表示工作7小時，「加2」表示加班2小時
+  // 依照表頭含「日期」、「工作總時數」、「加班總時數」文字的欄位導入
   const getDailyAttendance = (name, day) => {
     const data = sheetData.attendance;
-    if (!data?.rows?.length) return { work: null, overtime: null };
+    if (!data?.rows?.length || !data?.headers?.length) return { work: null, overtime: null };
     
-    // 找到該用戶的資料列
-    const userRow = data.rows.find(row => {
-      const rowName = getRowName(row);
-      return normalizeName(rowName) === normalizeName(name);
-    });
+    // 從表頭找到含「日期」、「工作總時數」、「加班總時數」文字的欄位名稱
+    const headers = data.headers;
+    let dateHeader = null;
+    let workHeader = null;
+    let overtimeHeader = null;
     
-    if (!userRow) return { work: null, overtime: null };
-    
-    // 找到日期欄位（格式：日期）
-    const dateValue = userRow['日期'] || userRow['出勤日期'] || userRow['打卡日期'];
-    if (!dateValue) {
-      // 如果沒有日期欄位，嘗試從 dateCols 找
-      const dayStr = String(day);
-      for (const [key, value] of Object.entries(userRow)) {
-        if (key.includes(dayStr) || key.includes(`/${day}`) || key.includes(`/${day}/`)) {
-          const val = String(value || '');
-          const workMatch = val.match(/工(\d+)/);
-          const overtimeMatch = val.match(/加(\d+)/);
-          return {
-            work: workMatch ? parseInt(workMatch[1], 10) : null,
-            overtime: overtimeMatch ? parseInt(overtimeMatch[1], 10) : null
-          };
-        }
-      }
+    for (const h of headers) {
+      const hStr = String(h || '');
+      if (hStr.includes('日期') && !dateHeader) dateHeader = h;
+      if (hStr.includes('工作總時數') && !workHeader) workHeader = h;
+      if (hStr.includes('加班總時數') && !overtimeHeader) overtimeHeader = h;
     }
+    
+    if (!dateHeader) return { work: null, overtime: null };
     
     // 從多筆資料中找到對應日期的資料
-    const targetRows = data.rows.filter(row => {
-      const rowName = getRowName(row);
-      if (normalizeName(rowName) !== normalizeName(name)) return false;
+    for (const row of data.rows) {
+      // 取得日期欄位值
+      const dateVal = row[dateHeader];
+      if (!dateVal) continue;
       
-      const dateVal = row['日期'] || row['出勤日期'] || row['打卡日期'];
-      if (!dateVal) return false;
-      
+      // 解析日期，取得日
       const dateStr = String(dateVal);
-      const match = dateStr.match(/(\d{1,2})[\/\-](\d{1,2})/);
-      if (match) {
-        const rowDay = parseInt(match[2] || match[1], 10);
-        return rowDay === day;
+      const match = dateStr.match(/(\d{1,2})[\/\-](\d{1,2})/) || dateStr.match(/(\d{1,2})日/);
+      if (!match) continue;
+      
+      // 判斷是 MM/DD 還是 DD 格式
+      let rowDay;
+      if (match[2]) {
+        rowDay = parseInt(match[2], 10); // MM/DD 格式，取第二個數字
+      } else {
+        rowDay = parseInt(match[1], 10); // DD 格式
       }
-      return false;
-    });
-    
-    if (targetRows.length === 0) return { work: null, overtime: null };
-    
-    const targetRow = targetRows[0];
-    
-    // 嘗試從各種欄位名稱中找工時和加班時數
-    let work = null;
-    let overtime = null;
-    
-    // 常見的工時欄位名稱
-    const workFields = ['工時', '工作時數', '正常工時', '實際工時', '出勤時數'];
-    const overtimeFields = ['加班', '加班時數', '加班工時', 'OT'];
-    
-    for (const field of workFields) {
-      if (targetRow[field] !== undefined) {
-        const val = String(targetRow[field] || '');
-        const match = val.match(/(\d+)/);
-        if (match) work = parseInt(match[1], 10);
-        break;
-      }
-    }
-    
-    for (const field of overtimeFields) {
-      if (targetRow[field] !== undefined) {
-        const val = String(targetRow[field] || '');
-        const match = val.match(/(\d+)/);
-        if (match) overtime = parseInt(match[1], 10);
-        break;
-      }
-    }
-    
-    // 如果找不到，嘗試從所有欄位中解析「工X」和「加X」格式
-    if (work === null || overtime === null) {
-      for (const [key, value] of Object.entries(targetRow)) {
-        const val = String(value || '');
-        if (work === null) {
-          const workMatch = val.match(/工(\d+)/);
-          if (workMatch) work = parseInt(workMatch[1], 10);
-        }
-        if (overtime === null) {
-          const overtimeMatch = val.match(/加(\d+)/);
-          if (overtimeMatch) overtime = parseInt(overtimeMatch[1], 10);
+      
+      if (rowDay !== day) continue;
+      
+      // 取得工作總時數和加班總時數
+      let work = null;
+      let overtime = null;
+      
+      if (workHeader) {
+        const workVal = row[workHeader];
+        if (workVal !== undefined && workVal !== null && workVal !== '') {
+          const val = String(workVal);
+          const numMatch = val.match(/(\d+\.?\d*)/);
+          if (numMatch) work = parseFloat(numMatch[1]);
         }
       }
+      
+      if (overtimeHeader) {
+        const overtimeVal = row[overtimeHeader];
+        if (overtimeVal !== undefined && overtimeVal !== null && overtimeVal !== '') {
+          const val = String(overtimeVal);
+          const numMatch = val.match(/(\d+\.?\d*)/);
+          if (numMatch) overtime = parseFloat(numMatch[1]);
+        }
+      }
+      
+      if (work !== null || overtime !== null) {
+        return { work, overtime };
+      }
     }
     
-    return { work, overtime };
+    return { work: null, overtime: null };
   };
 
   // 處理登入 (自動辨識倉別)
