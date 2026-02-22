@@ -331,13 +331,40 @@ export async function getSheetData(warehouse, sheetName, name = '', options = {}
     let headers = values[headerRowIndex] || [];
     let dataStartIndex = headerRowIndex + 1;
     
-    // RC 出勤時數分頁：表頭在第1行（儲存格內有換行符），資料從第2行開始
-    // 不需要特殊處理，使用預設邏輯即可
+    // RC 出勤時數分頁：檢查是否需要合併多行表頭
     if (isDoubleHeaderAttendanceSheet(warehouse, sheetName)) {
-      // 表頭在第1行（索引0），資料從第2行開始（索引1）
-      headers = values[0] || [];
-      dataStartIndex = 1;
-      console.log(`📊 [PoC] getSheetData: ${sheetName} - RC出勤時數, headers=`, headers.slice(0, 12));
+      // 先檢查第一行的表頭內容
+      const row1 = values[0] || [];
+      console.log(`📊 [PoC] getSheetData: ${sheetName} - RC出勤時數 row1=`, row1);
+      
+      // 檢查是否有第二行，且第二行看起來像是表頭的延續（例如包含「時間」、「打卡」等）
+      const row2 = values[1] || [];
+      const row2HasHeaderContent = row2.some(cell => {
+        const s = String(cell || '');
+        return s.includes('時間') || s.includes('打卡') || s.includes('時數') || s.includes('計薪');
+      });
+      
+      if (row2HasHeaderContent) {
+        // 合併兩行表頭
+        const maxLen = Math.max(row1.length, row2.length);
+        headers = [];
+        for (let idx = 0; idx < maxLen; idx++) {
+          const h1 = String(row1[idx] || '').trim();
+          const h2 = String(row2[idx] || '').trim();
+          if (h2 && h2 !== h1) {
+            headers.push(`${h1}\n${h2}`);
+          } else {
+            headers.push(h1 || `col_${idx + 1}`);
+          }
+        }
+        dataStartIndex = 2; // 資料從第3行開始
+        console.log(`📊 [PoC] getSheetData: ${sheetName} - 合併雙行表頭, headers=`, headers.slice(0, 12));
+      } else {
+        // 單行表頭
+        headers = row1;
+        dataStartIndex = 1;
+        console.log(`📊 [PoC] getSheetData: ${sheetName} - 單行表頭, headers=`, headers.slice(0, 12));
+      }
     }
     
     // 解析日期欄位
