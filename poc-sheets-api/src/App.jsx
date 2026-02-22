@@ -78,6 +78,7 @@ const App = () => {
   const [showSheetModal, setShowSheetModal] = useState(false);
   const [modalType, setModalType] = useState('schedule');
   const [isDownloading, setIsDownloading] = useState(false);
+  const [showAttendanceCalendar, setShowAttendanceCalendar] = useState(false);
   
   // 月曆區域的 ref（用於下載 PNG）
   const calendarRef = useRef(null);
@@ -552,6 +553,103 @@ const App = () => {
     const v = getDailyStatusFrom(sheetData.records, name, day);
     if (v !== "上班") return v;
     return getDailyStatus(name, day);
+  };
+
+  // 獲取每日工時數據（從出勤時數分頁）
+  // 欄位格式：「工7」表示工作7小時，「加2」表示加班2小時
+  const getDailyAttendance = (name, day) => {
+    const data = sheetData.attendance;
+    if (!data?.rows?.length) return { work: null, overtime: null };
+    
+    // 找到該用戶的資料列
+    const userRow = data.rows.find(row => {
+      const rowName = getRowName(row);
+      return normalizeName(rowName) === normalizeName(name);
+    });
+    
+    if (!userRow) return { work: null, overtime: null };
+    
+    // 找到日期欄位（格式：日期）
+    const dateValue = userRow['日期'] || userRow['出勤日期'] || userRow['打卡日期'];
+    if (!dateValue) {
+      // 如果沒有日期欄位，嘗試從 dateCols 找
+      const dayStr = String(day);
+      for (const [key, value] of Object.entries(userRow)) {
+        if (key.includes(dayStr) || key.includes(`/${day}`) || key.includes(`/${day}/`)) {
+          const val = String(value || '');
+          const workMatch = val.match(/工(\d+)/);
+          const overtimeMatch = val.match(/加(\d+)/);
+          return {
+            work: workMatch ? parseInt(workMatch[1], 10) : null,
+            overtime: overtimeMatch ? parseInt(overtimeMatch[1], 10) : null
+          };
+        }
+      }
+    }
+    
+    // 從多筆資料中找到對應日期的資料
+    const targetRows = data.rows.filter(row => {
+      const rowName = getRowName(row);
+      if (normalizeName(rowName) !== normalizeName(name)) return false;
+      
+      const dateVal = row['日期'] || row['出勤日期'] || row['打卡日期'];
+      if (!dateVal) return false;
+      
+      const dateStr = String(dateVal);
+      const match = dateStr.match(/(\d{1,2})[\/\-](\d{1,2})/);
+      if (match) {
+        const rowDay = parseInt(match[2] || match[1], 10);
+        return rowDay === day;
+      }
+      return false;
+    });
+    
+    if (targetRows.length === 0) return { work: null, overtime: null };
+    
+    const targetRow = targetRows[0];
+    
+    // 嘗試從各種欄位名稱中找工時和加班時數
+    let work = null;
+    let overtime = null;
+    
+    // 常見的工時欄位名稱
+    const workFields = ['工時', '工作時數', '正常工時', '實際工時', '出勤時數'];
+    const overtimeFields = ['加班', '加班時數', '加班工時', 'OT'];
+    
+    for (const field of workFields) {
+      if (targetRow[field] !== undefined) {
+        const val = String(targetRow[field] || '');
+        const match = val.match(/(\d+)/);
+        if (match) work = parseInt(match[1], 10);
+        break;
+      }
+    }
+    
+    for (const field of overtimeFields) {
+      if (targetRow[field] !== undefined) {
+        const val = String(targetRow[field] || '');
+        const match = val.match(/(\d+)/);
+        if (match) overtime = parseInt(match[1], 10);
+        break;
+      }
+    }
+    
+    // 如果找不到，嘗試從所有欄位中解析「工X」和「加X」格式
+    if (work === null || overtime === null) {
+      for (const [key, value] of Object.entries(targetRow)) {
+        const val = String(value || '');
+        if (work === null) {
+          const workMatch = val.match(/工(\d+)/);
+          if (workMatch) work = parseInt(workMatch[1], 10);
+        }
+        if (overtime === null) {
+          const overtimeMatch = val.match(/加(\d+)/);
+          if (overtimeMatch) overtime = parseInt(overtimeMatch[1], 10);
+        }
+      }
+    }
+    
+    return { work, overtime };
   };
 
   // 處理登入 (自動辨識倉別)
@@ -1069,6 +1167,12 @@ const App = () => {
                       {isDownloading ? <Loader2 size={12} className="animate-spin"/> : <Download size={12}/>} 下載
                     </button>
                     <button
+                      onClick={() => setShowAttendanceCalendar(true)}
+                      className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1"
+                    >
+                      <CalendarIcon size={12}/> 工時月曆版
+                    </button>
+                    <button
                       onClick={() => {
                         setModalType('attendance');
                         setShowSheetModal(true);
@@ -1106,6 +1210,7 @@ const App = () => {
                   </table>
                 )}
               </div>
+              
             </section>
           ))}
 
@@ -1286,6 +1391,58 @@ const App = () => {
           {user.warehouse === 'TAO1' && <NavBtn active={activeTab === 'logs'} onClick={() => setActiveTab('logs')} icon={<Fingerprint size={22}/>} label="出勤記錄表" />}
           {user.warehouse === 'TAO1' && <NavBtn active={activeTab === 'adjustment'} onClick={() => setActiveTab('adjustment')} icon={<FileEdit size={22}/>} label="調假" />}
         </nav>
+
+        {/* 工時月曆版彈窗 */}
+        {showAttendanceCalendar && (
+          <div className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-lg flex items-center justify-center p-4">
+            <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl">
+              <div className="px-6 py-4 bg-slate-50 border-b flex items-center justify-between">
+                <h3 className="text-lg font-black text-slate-900">📅 工時月曆版</h3>
+                <button onClick={() => setShowAttendanceCalendar(false)} className="p-2 bg-white shadow border border-slate-200 rounded-xl text-slate-400 hover:text-red-500">
+                  <X size={20}/>
+                </button>
+              </div>
+              <div className="p-4 bg-white">
+                <div className="text-center mb-3 text-sm font-bold text-slate-600">{user.name} - {year}年{selectedMonth}月 工時月曆</div>
+                <div className="grid grid-cols-7 gap-1">
+                  {['日','一','二','三','四','五','六'].map(w => (
+                    <div key={w} className="text-center text-xs font-bold text-slate-400 py-1">{w}</div>
+                  ))}
+                  {/* 上個月跨月日期 */}
+                  {prevMonthDates.map((d) => (
+                    <div key={`att-prev-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50">
+                      <span className="text-sm font-bold text-slate-300 mt-0.5">{d}</span>
+                    </div>
+                  ))}
+                  {/* 當月日期 */}
+                  {daysArray.map((d) => {
+                    const att = getDailyAttendance(user.name, d);
+                    const hasData = att.work !== null || att.overtime !== null;
+                    return (
+                      <div key={`att-${d}`} className={`aspect-square rounded flex flex-col items-center border ${hasData ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white'}`}>
+                        <span className={`text-sm font-black mt-0.5 ${hasData ? 'text-blue-700' : 'text-slate-950'}`}>{d}</span>
+                        {hasData && (
+                          <div className="text-[8px] font-bold leading-tight text-center">
+                            {att.work !== null && <span className="text-emerald-600">工{att.work}</span>}
+                            {att.work !== null && att.overtime !== null && <span className="text-slate-400">,</span>}
+                            {att.overtime !== null && <span className="text-orange-600">加{att.overtime}</span>}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {/* 下個月跨月日期 */}
+                  {nextMonthDates.map((d) => (
+                    <div key={`att-next-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50">
+                      <span className="text-sm font-bold text-slate-300 mt-0.5">{d}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-slate-400 mt-3 text-center">所有資料為酷澎提供系統匯入</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* 原始 Sheet 彈窗 */}
         {/* 圖片預覽模態框 - 讓用戶長按保存或點擊下載 */}
