@@ -360,11 +360,12 @@ export async function getSheetData(warehouse, sheetName, name = '', options = {}
       const maxLen = Math.max(...headerRows.map(r => r.length));
       headers = [];
       for (let idx = 0; idx < maxLen; idx++) {
-        const parts = headerRows.map(r => String(r[idx] || '').trim()).filter(v => v);
+        // 先將每個 cell 的換行符替換為空格
+        const parts = headerRows.map(r => String(r[idx] || '').replace(/[\n\r]+/g, ' ').trim()).filter(v => v);
         // 過濾重複值
         const uniqueParts = parts.filter((v, i, arr) => arr.indexOf(v) === i);
-        // 合併並將換行符替換為空格
-        const merged = uniqueParts.join(' ').replace(/[\n\r]+/g, ' ').trim();
+        // 合併
+        const merged = uniqueParts.join(' ').trim();
         headers.push(merged || `col_${idx + 1}`);
       }
       dataStartIndex = headerRows.length;
