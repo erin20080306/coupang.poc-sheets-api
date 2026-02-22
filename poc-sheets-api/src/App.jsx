@@ -474,7 +474,8 @@ const App = () => {
 
       const rowsToCheck = matched;
       if (attendanceHeaders.length === 0 && parsed.headers.length > 0) {
-        attendanceHeaders = parsed.headers;
+        // 將表頭中的換行符替換為空格
+        attendanceHeaders = parsed.headers.map(h => String(h || '').replace(/[\n\r]+/g, ' ').trim());
       }
 
       for (const row of rowsToCheck) {
