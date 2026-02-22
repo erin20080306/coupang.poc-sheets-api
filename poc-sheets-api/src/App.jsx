@@ -568,19 +568,20 @@ const App = () => {
     let overtimeHeader = null;
     
     for (const h of headers) {
-      const hStr = String(h || '');
+      const hStr = String(h || '').replace(/\s+/g, ''); // 移除所有空白和換行
       if (hStr.includes('日期') && !dateHeader) dateHeader = h;
-      if (hStr.includes('工作總時數') && !workHeader) workHeader = h;
-      if (hStr.includes('加班總時數') && !overtimeHeader) overtimeHeader = h;
+      if ((hStr.includes('工作') && hStr.includes('總時數')) && !workHeader) workHeader = h;
+      if ((hStr.includes('加班') && hStr.includes('總時數')) && !overtimeHeader) overtimeHeader = h;
     }
     
     // Debug: 只在第一天時輸出
     if (day === 1) {
-      console.log('📊 [工時月曆] headers:', headers.slice(0, 15));
+      console.log('📊 [工時月曆] headers 完整:', headers.join(', '));
       console.log('📊 [工時月曆] dateHeader:', dateHeader, 'workHeader:', workHeader, 'overtimeHeader:', overtimeHeader);
       console.log('📊 [工時月曆] rows count:', data.rows.length);
       if (data.rows.length > 0) {
-        console.log('📊 [工時月曆] first row:', data.rows[0]);
+        console.log('📊 [工時月曆] first row keys:', Object.keys(data.rows[0]).join(', '));
+        console.log('📊 [工時月曆] first row values:', Object.values(data.rows[0]).slice(0, 15).join(', '));
       }
     }
     
