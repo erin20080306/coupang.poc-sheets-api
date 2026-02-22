@@ -5,7 +5,7 @@ import './index.css'
 import { registerSW } from 'virtual:pwa-register'
 
 // 強制清除舊版快取
-const CURRENT_VERSION = 'v2.2';
+const CURRENT_VERSION = 'v2.3';
 const storedVersion = localStorage.getItem('app_version');
 if (storedVersion !== CURRENT_VERSION) {
   localStorage.setItem('app_version', CURRENT_VERSION);
