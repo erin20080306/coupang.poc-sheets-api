@@ -1231,7 +1231,13 @@ const App = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {sheetData.attendance.rows.slice(0, 20).map((row, idx) => (
+                      {sheetData.attendance.rows.slice(0, 20).map((row, idx) => {
+                        if (idx === 0) {
+                          console.log('🔍 [出勤表格] row keys:', Object.keys(row));
+                          console.log('🔍 [出勤表格] headers:', sheetData.attendance.headers.slice(0, 11));
+                          console.log('🔍 [出勤表格] row 完整資料:', row);
+                        }
+                        return (
                         <tr key={idx} className="hover:bg-slate-50 text-center">
                           {sheetData.attendance.headers.slice(0, 11).map((header, colIdx) => {
                             // 嘗試用表頭取值
@@ -1254,7 +1260,7 @@ const App = () => {
                             );
                           })}
                         </tr>
-                      ))}
+                      );})}
                     </tbody>
                   </table>
                 )}
