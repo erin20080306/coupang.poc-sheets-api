@@ -7,7 +7,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // 重新整理時自動更新
+      // 強制跳過等待，立即啟用新版本
+      selfDestroying: false,
       devOptions: {
         enabled: false
       },
