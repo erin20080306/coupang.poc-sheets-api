@@ -267,17 +267,23 @@ const App = () => {
         const type = classifySheet(sheetName);
         const parsed = parseSheetData(raw);
         
-        // 將表頭中的換行符替換為空格（支援實際換行符和字面上的 \n 字串）
+        // 將表頭中的換行符替換為空格
         if (parsed.headers) {
           parsed.headers = parsed.headers.map(h => {
             let s = String(h || '');
-            // 替換實際的換行符和回車符
-            s = s.replace(/\n/g, ' ').replace(/\r/g, ' ');
-            // 替換字面上的反斜線n字串
-            s = s.split('\\n').join(' ');
+            // 使用 charCodeAt 檢查並替換換行符 (10) 和回車符 (13)
+            let result = '';
+            for (let i = 0; i < s.length; i++) {
+              const code = s.charCodeAt(i);
+              if (code === 10 || code === 13) {
+                result += ' ';
+              } else {
+                result += s[i];
+              }
+            }
             // 清理多餘空格
-            s = s.replace(/\s+/g, ' ').trim();
-            return s;
+            result = result.replace(/\s+/g, ' ').trim();
+            return result;
           });
         }
         
