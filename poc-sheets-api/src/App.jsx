@@ -581,8 +581,16 @@ const App = () => {
     for (const h of headers) {
       const hStr = String(h || '').replace(/[\s\n\r]/g, ''); // 移除所有空白和換行
       if (hStr.includes('日期') && !dateHeader) dateHeader = h;
-      if ((hStr.includes('工作') && hStr.includes('總時數')) && !workHeader) workHeader = h;
-      if ((hStr.includes('加班') && hStr.includes('總時數')) && !overtimeHeader) overtimeHeader = h;
+      // 匹配「工作總時數」或「計薪工時」
+      if (!workHeader && (
+        (hStr.includes('工作') && hStr.includes('總時數')) ||
+        hStr.includes('計薪工時')
+      )) workHeader = h;
+      // 匹配「加班總時數」或「加班總」
+      if (!overtimeHeader && (
+        (hStr.includes('加班') && hStr.includes('總時數')) ||
+        (hStr.includes('加班') && hStr.includes('總'))
+      )) overtimeHeader = h;
     }
     
     // Debug: 只在第一天時輸出
