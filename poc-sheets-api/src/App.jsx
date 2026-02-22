@@ -572,40 +572,40 @@ const App = () => {
     const data = sheetData.attendance;
     if (!data?.rows?.length || !data?.headers?.length) return { work: null, overtime: null };
     
-    // 從表頭找到含「日期」、「工作總時數」、「加班總時數」文字的欄位名稱
+    // 從表頭找到含「日期」、「工作總時數」、「加班總時數」文字的欄位索引
     const headers = data.headers;
-    let dateHeader = null;
-    let workHeader = null;
-    let overtimeHeader = null;
+    let dateIdx = -1;
+    let workIdx = -1;
+    let overtimeIdx = -1;
     
-    for (const h of headers) {
-      const hStr = String(h || '').replace(/[\s\n\r]/g, ''); // 移除所有空白和換行
-      if (hStr.includes('日期') && !dateHeader) dateHeader = h;
+    for (let i = 0; i < headers.length; i++) {
+      const hStr = String(headers[i] || '').replace(/[\s\n\r]/g, ''); // 移除所有空白和換行
+      if (hStr.includes('日期') && dateIdx < 0) dateIdx = i;
       // 匹配「工作總時數」或「工作」+「總時數」或「計薪工時」
-      if (!workHeader && (
+      if (workIdx < 0 && (
         hStr.includes('工作總時數') ||
         (hStr.includes('工作') && hStr.includes('總時數')) ||
         (hStr.includes('工作') && hStr.includes('計薪工時'))
-      )) workHeader = h;
+      )) workIdx = i;
       // 匹配「加班總時數」或「加班」+「總時數」或「加班」+「計薪工時」
-      if (!overtimeHeader && (
+      if (overtimeIdx < 0 && (
         hStr.includes('加班總時數') ||
         (hStr.includes('加班') && hStr.includes('總時數')) ||
         (hStr.includes('加班') && hStr.includes('計薪工時'))
-      )) overtimeHeader = h;
+      )) overtimeIdx = i;
     }
     
     // Debug: 只在第一天時輸出
     if (day === 1) {
       console.log('📊 [工時月曆] headers:', headers);
-      console.log('📊 [工時月曆] dateHeader:', dateHeader, 'workHeader:', workHeader, 'overtimeHeader:', overtimeHeader);
-      // 輸出第一筆資料的所有欄位
-      if (data.rows.length > 0) {
-        console.log('📊 [工時月曆] 第一筆資料:', data.rows[0]);
-      }
+      console.log('📊 [工時月曆] dateIdx:', dateIdx, 'workIdx:', workIdx, 'overtimeIdx:', overtimeIdx);
     }
     
-    if (!dateHeader) return { work: null, overtime: null };
+    if (dateIdx < 0) return { work: null, overtime: null };
+    
+    const dateHeader = headers[dateIdx];
+    const workHeader = workIdx >= 0 ? headers[workIdx] : null;
+    const overtimeHeader = overtimeIdx >= 0 ? headers[overtimeIdx] : null;
     
     // 從多筆資料中找到對應日期的資料
     for (const row of data.rows) {
@@ -656,8 +656,8 @@ const App = () => {
       }
       
       // Debug: 輸出找到的數據
-      if (day === 3) {
-        console.log('📊 [工時月曆] day 3 found:', { dateVal, workHeader, workVal: row[workHeader], overtimeHeader, overtimeVal: row[overtimeHeader], work, overtime });
+      if (day === 1) {
+        console.log('📊 [工時月曆] day 1 found:', { dateVal, workHeader, workVal: row[workHeader], overtimeHeader, overtimeVal: row[overtimeHeader], work, overtime });
       }
       
       return { work, overtime };
