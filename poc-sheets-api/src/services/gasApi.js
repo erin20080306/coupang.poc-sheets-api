@@ -332,6 +332,12 @@ export async function getSheetData(warehouse, sheetName, name = '', options = {}
     let headers = (values[headerRowIndex] || []).map(h => String(h || '').replace(/[\n\r]+/g, ' ').trim());
     let dataStartIndex = headerRowIndex + 1;
     
+    // 所有出勤時數分頁：將表頭中的換行符替換為空格
+    if (sheetName.includes('出勤時數')) {
+      headers = headers.map(h => String(h || '').replace(/[\n\r]+/g, ' ').trim());
+      console.log(`📊 [PoC] getSheetData: ${sheetName} - 處理換行符後 headers=`, headers.slice(0, 12));
+    }
+    
     // RC 出勤時數分頁：檢查是否需要合併多行表頭（最多 3 行）
     if (isDoubleHeaderAttendanceSheet(warehouse, sheetName)) {
       const row1 = values[0] || [];
