@@ -267,6 +267,11 @@ const App = () => {
         const type = classifySheet(sheetName);
         const parsed = parseSheetData(raw);
         
+        // 將表頭中的換行符替換為空格
+        if (parsed.headers) {
+          parsed.headers = parsed.headers.map(h => String(h || '').replace(/[\n\r]+/g, ' ').trim());
+        }
+        
         // Debug: 顯示解析後的資料
         console.log(`📋 [Debug] ${sheetName}: headers=`, parsed.headers?.slice(0, 10));
         if (parsed.rows.length > 0) {
