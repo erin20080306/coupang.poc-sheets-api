@@ -331,20 +331,25 @@ export async function getSheetData(warehouse, sheetName, name = '', options = {}
     let headers = values[headerRowIndex] || [];
     let dataStartIndex = headerRowIndex + 1;
     
-    // RC 出勤時數分頁：表頭分成兩行，需要合併
-    if (isDoubleHeaderAttendanceSheet(warehouse, sheetName) && values.length > 1) {
+    // RC 出勤時數分頁：表頭分成三行，需要合併
+    if (isDoubleHeaderAttendanceSheet(warehouse, sheetName) && values.length > 2) {
       const row1 = values[0] || [];
       const row2 = values[1] || [];
-      // 合併兩行表頭：如果第二行有值，用換行符連接
-      headers = row1.map((h1, idx) => {
-        const h2 = row2[idx] || '';
-        if (h2 && h2 !== h1) {
-          return `${h1}\n${h2}`;
-        }
-        return h1 || '';
-      });
-      dataStartIndex = 2; // 資料從第3行開始
-      console.log(`📊 [PoC] getSheetData: ${sheetName} - 雙行表頭合併, headers=`, headers.slice(0, 10));
+      const row3 = values[2] || [];
+      // 找出最長的行來決定欄位數量
+      const maxLen = Math.max(row1.length, row2.length, row3.length);
+      // 合併三行表頭：用換行符連接非空值
+      headers = [];
+      for (let idx = 0; idx < maxLen; idx++) {
+        const h1 = String(row1[idx] || '').trim();
+        const h2 = String(row2[idx] || '').trim();
+        const h3 = String(row3[idx] || '').trim();
+        // 過濾掉空值和重複值，用換行符連接
+        const parts = [h1, h2, h3].filter((v, i, arr) => v && arr.indexOf(v) === i);
+        headers.push(parts.join('\n') || `col_${idx + 1}`);
+      }
+      dataStartIndex = 3; // 資料從第4行開始
+      console.log(`📊 [PoC] getSheetData: ${sheetName} - 三行表頭合併, headers=`, headers.slice(0, 12));
     }
     
     // 解析日期欄位
