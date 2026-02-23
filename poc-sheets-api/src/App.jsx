@@ -92,7 +92,8 @@ const App = () => {
   const [adminSearchName, setAdminSearchName] = useState('');
   
     
-  // 檢測是否為手機 PWA 模式（手機安裝後開啟）
+  // 檢測是否為手機（螢幕寬度小於 768px）和 PWA 模式
+  const [isMobile, setIsMobile] = useState(false);
   const [isPWA, setIsPWA] = useState(false);
   useEffect(() => {
     // 檢測 PWA standalone 模式
@@ -100,9 +101,9 @@ const App = () => {
       || window.navigator.standalone === true
       || document.referrer.includes('android-app://');
     // 檢測是否為手機（螢幕寬度小於 768px）
-    const isMobile = window.innerWidth < 768;
-    // 只有手機 PWA 才設為 true
-    setIsPWA(isStandalone && isMobile);
+    const mobile = window.innerWidth < 768;
+    setIsMobile(mobile);
+    setIsPWA(isStandalone && mobile);
     
     // 新增：重新整理時檢查 PWA 更新
     if ('serviceWorker' in navigator) {
@@ -1142,16 +1143,16 @@ const App = () => {
                 </div>
               </div>
               <p className="text-xs text-slate-400 mb-4">所有資料為酷澎提供系統匯入</p>
-              <div ref={calendarRef} className={`bg-white ${isPWA ? 'p-4' : 'p-6'}`}>
-                <div className={`text-center mb-2 ${isPWA ? 'text-sm' : 'text-lg'} font-bold text-slate-600`}>{user.name} - {year}年{selectedMonth}月 班表</div>
-                <div className={`grid grid-cols-7 ${isPWA ? 'gap-1' : 'gap-2'}`}>
+              <div ref={calendarRef} className={`bg-white ${isMobile ? 'p-4' : 'p-6'}`}>
+                <div className={`text-center mb-2 ${isMobile ? 'text-sm' : 'text-lg'} font-bold text-slate-600`}>{user.name} - {year}年{selectedMonth}月 班表</div>
+                <div className={`grid grid-cols-7 ${isMobile ? 'gap-1' : 'gap-2'}`}>
                   {['日','一','二','三','四','五','六'].map(w => (
-                    <div key={w} className={`text-center ${isPWA ? 'text-xs' : 'text-base'} font-bold text-slate-400 py-1`}>{w}</div>
+                    <div key={w} className={`text-center ${isMobile ? 'text-sm' : 'text-base'} font-bold text-slate-400 py-1`}>{w}</div>
                   ))}
                   {/* 上個月跨月日期 */}
                   {prevMonthDates.map((d) => (
-                    <div key={`prev-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50">
-                      <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
+                    <div key={`prev-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50 overflow-hidden">
+                      <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
                     </div>
                   ))}
                   {/* 當月日期 */}
@@ -1168,9 +1169,9 @@ const App = () => {
                       const displayStatus = isLeave ? status : '';
                       const hasStatus = isLeave && displayStatus;
                       return (
-                        <div key={d} className={`aspect-square rounded flex flex-col items-center border ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
-                          <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-black mt-0.5 ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
-                          {hasStatus && <span className={`${isPWA ? 'text-[9px]' : 'text-sm'} font-bold ${config.text}`}>{displayStatus}</span>}
+                        <div key={d} className={`aspect-square rounded flex flex-col items-center border overflow-hidden ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
+                          <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black mt-0.5 ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
+                          {hasStatus && <span className={`${isMobile ? 'text-[11px]' : 'text-sm'} font-bold ${config.text}`}>{displayStatus}</span>}
                         </div>
                       );
                     }
@@ -1178,16 +1179,16 @@ const App = () => {
                     // 其他倉：顯示所有非「上班」和非空白的狀態
                     const displayStatus = isLeave ? status : '';
                     return (
-                      <div key={d} className={`aspect-square rounded flex flex-col items-center border ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
-                        <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-black mt-0.5 ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
-                        {displayStatus && <span className={`${isPWA ? 'text-[9px]' : 'text-sm'} font-bold ${isInLeaveMap ? config.text : 'text-slate-600'}`}>{displayStatus}</span>}
+                      <div key={d} className={`aspect-square rounded flex flex-col items-center border overflow-hidden ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
+                        <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black mt-0.5 ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
+                        {displayStatus && <span className={`${isMobile ? 'text-[11px]' : 'text-sm'} font-bold ${isInLeaveMap ? config.text : 'text-slate-600'}`}>{displayStatus}</span>}
                       </div>
                     );
                   })}
                   {/* 下個月跨月日期 */}
                   {nextMonthDates.map((d) => (
-                    <div key={`next-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50">
-                      <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
+                    <div key={`next-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50 overflow-hidden">
+                      <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
                     </div>
                   ))}
                 </div>
@@ -1365,17 +1366,16 @@ const App = () => {
                 </div>
               </div>
               <p className="text-xs text-slate-400 px-6 mt-2">所有資料為酷澎提供系統匯入</p>
-              <div ref={recordsCalendarRef} className={`bg-white ${isPWA ? 'p-2' : 'p-6'}`}>
-                <div className={`text-center mb-3 ${isPWA ? 'text-sm' : 'text-lg'} font-bold text-slate-600`}>{user.name} - {year}年{selectedMonth}月 出勤記錄</div>
-                <div className={`grid grid-cols-7 ${isPWA ? 'gap-2' : 'gap-3'}`}>
+              <div ref={recordsCalendarRef} className={`bg-white ${isMobile ? 'p-4' : 'p-6'}`}>
+                <div className={`text-center mb-3 ${isMobile ? 'text-sm' : 'text-lg'} font-bold text-slate-600`}>{user.name} - {year}年{selectedMonth}月 出勤記錄</div>
+                <div className={`grid grid-cols-7 ${isMobile ? 'gap-1' : 'gap-2'}`}>
                 {['日','一','二','三','四','五','六'].map(w => (
-                  <div key={w} className={`text-center ${isPWA ? 'text-xs' : 'text-base'} font-bold text-slate-400 py-1`}>{w}</div>
+                  <div key={w} className={`text-center ${isMobile ? 'text-sm' : 'text-base'} font-bold text-slate-400 py-1`}>{w}</div>
                 ))}
                 {/* 上個月跨月日期 */}
                 {prevMonthDates.map((d) => (
-                  <div key={`prev-log-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm">
-                    <span className="text-[10px] font-bold text-slate-300">{prevMonth}月</span>
-                    <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-bold leading-none text-slate-300`}>{d}</span>
+                  <div key={`prev-log-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50 overflow-hidden">
+                    <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
                   </div>
                 ))}
                 {/* 當月日期 */}
@@ -1388,17 +1388,16 @@ const App = () => {
                   const config = COLOR_CONFIG[status] || (isLeave ? COLOR_CONFIG["事"] : COLOR_CONFIG["上班"]);
                   const displayStatus = isLeave ? status : '';
                   return (
-                    <div key={d} className={`aspect-square rounded-xl flex flex-col items-center justify-center border transition-all ${isInLeaveMap ? `${config.bg} ${config.border} shadow-md` : 'bg-white border-slate-100'}`}>
-                      <span className={`${isPWA ? 'text-xl' : 'text-5xl'} font-black leading-none ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
-                      {displayStatus && <span className={`${isPWA ? 'text-[10px]' : 'text-base'} font-bold ${isPWA ? 'mt-0.5' : 'mt-1'} ${isInLeaveMap ? config.text : 'text-slate-500'}`}>{status}</span>}
+                    <div key={d} className={`aspect-square rounded flex flex-col items-center border overflow-hidden ${isInLeaveMap ? `${config.bg} ${config.border}` : 'bg-white border-slate-100'}`}>
+                      <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black mt-0.5 ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
+                      {displayStatus && <span className={`${isMobile ? 'text-[11px]' : 'text-sm'} font-bold ${isInLeaveMap ? config.text : 'text-slate-500'}`}>{status}</span>}
                     </div>
                   );
                 })}
                 {/* 下個月跨月日期 */}
                 {nextMonthDates.map((d) => (
-                  <div key={`next-log-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm">
-                    <span className="text-[10px] font-bold text-slate-300">{nextMonth}月</span>
-                    <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-bold leading-none text-slate-300`}>{d}</span>
+                  <div key={`next-log-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50 overflow-hidden">
+                    <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
                   </div>
                 ))}
                 </div>
@@ -1468,23 +1467,23 @@ const App = () => {
         {/* 工時月曆版彈窗 */}
         {showAttendanceCalendar && (
           <div className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-lg flex items-center justify-center p-4">
-            <div className={`bg-white w-full ${isPWA ? 'max-w-md' : 'max-w-2xl'} rounded-3xl overflow-hidden shadow-2xl`}>
+            <div className={`bg-white w-full ${isMobile ? 'max-w-md' : 'max-w-2xl'} rounded-3xl overflow-hidden shadow-2xl`}>
               <div className="px-6 py-4 bg-slate-50 border-b flex items-center justify-between">
-                <h3 className={`${isPWA ? 'text-lg' : 'text-2xl'} font-black text-slate-900`}>📅 工時月曆版</h3>
+                <h3 className={`${isMobile ? 'text-lg' : 'text-2xl'} font-black text-slate-900`}>📅 工時月曆版</h3>
                 <button onClick={() => setShowAttendanceCalendar(false)} className="p-2 bg-white shadow border border-slate-200 rounded-xl text-slate-400 hover:text-red-500">
                   <X size={20}/>
                 </button>
               </div>
-              <div className={`${isPWA ? 'p-4' : 'p-6'} bg-white`}>
-                <div className={`text-center mb-3 ${isPWA ? 'text-sm' : 'text-lg'} font-bold text-slate-600`}>{user.name} - {year}年{selectedMonth}月 工時月曆</div>
-                <div className={`grid grid-cols-7 ${isPWA ? 'gap-1' : 'gap-2'}`}>
+              <div className={`${isMobile ? 'p-4' : 'p-6'} bg-white`}>
+                <div className={`text-center mb-3 ${isMobile ? 'text-sm' : 'text-lg'} font-bold text-slate-600`}>{user.name} - {year}年{selectedMonth}月 工時月曆</div>
+                <div className={`grid grid-cols-7 ${isMobile ? 'gap-1' : 'gap-2'}`}>
                   {['日','一','二','三','四','五','六'].map(w => (
-                    <div key={w} className={`text-center ${isPWA ? 'text-xs' : 'text-base'} font-bold text-slate-400 py-1`}>{w}</div>
+                    <div key={w} className={`text-center ${isMobile ? 'text-sm' : 'text-base'} font-bold text-slate-400 py-1`}>{w}</div>
                   ))}
                   {/* 上個月跨月日期 */}
                   {prevMonthDates.map((d) => (
-                    <div key={`att-prev-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50">
-                      <span className={`${isPWA ? 'text-sm' : 'text-xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
+                    <div key={`att-prev-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50 overflow-hidden">
+                      <span className={`${isMobile ? 'text-sm' : 'text-xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
                     </div>
                   ))}
                   {/* 當月日期 */}
@@ -1493,10 +1492,10 @@ const App = () => {
                     const hasData = att.work !== null || att.overtime !== null || (att.note && att.note.includes('國出'));
                     const isNationalLeave = att.note && att.note.includes('國出');
                     return (
-                      <div key={`att-${d}`} className={`aspect-square rounded flex flex-col items-center border ${isNationalLeave ? 'border-purple-200 bg-purple-50' : hasData ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white'}`}>
-                        <span className={`${isPWA ? 'text-sm' : 'text-xl'} font-black mt-0.5 ${isNationalLeave ? 'text-purple-700' : hasData ? 'text-blue-700' : 'text-slate-950'}`}>{d}</span>
+                      <div key={`att-${d}`} className={`aspect-square rounded flex flex-col items-center border overflow-hidden ${isNationalLeave ? 'border-purple-200 bg-purple-50' : hasData ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white'}`}>
+                        <span className={`${isMobile ? 'text-sm' : 'text-xl'} font-black mt-0.5 ${isNationalLeave ? 'text-purple-700' : hasData ? 'text-blue-700' : 'text-slate-950'}`}>{d}</span>
                         {hasData && (
-                          <div className={`${isPWA ? 'text-[10px]' : 'text-sm'} font-bold leading-tight text-center`}>
+                          <div className={`${isMobile ? 'text-[10px]' : 'text-sm'} font-bold leading-tight text-center`}>
                             {isNationalLeave && <div className="text-purple-600">國出</div>}
                             {att.work !== null && <span className="text-emerald-600">工{att.work}</span>}
                             {att.work !== null && att.overtime !== null && <span className="text-slate-400">,</span>}
@@ -1508,12 +1507,12 @@ const App = () => {
                   })}
                   {/* 下個月跨月日期 */}
                   {nextMonthDates.map((d) => (
-                    <div key={`att-next-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50">
-                      <span className={`${isPWA ? 'text-sm' : 'text-xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
+                    <div key={`att-next-${d}`} className="aspect-square rounded flex flex-col items-center border border-slate-50 bg-slate-50/50 overflow-hidden">
+                      <span className={`${isMobile ? 'text-sm' : 'text-xl'} font-bold text-slate-300 mt-0.5`}>{d}</span>
                     </div>
                   ))}
                 </div>
-                <p className={`${isPWA ? 'text-xs' : 'text-sm'} text-slate-400 mt-3 text-center`}>所有資料為酷澎提供系統匯入</p>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-slate-400 mt-3 text-center`}>所有資料為酷澎提供系統匯入</p>
               </div>
             </div>
           </div>
