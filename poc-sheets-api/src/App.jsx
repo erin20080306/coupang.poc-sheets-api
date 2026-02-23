@@ -826,52 +826,14 @@ const App = () => {
     try {
       const element = refElement.current;
       
-      // 暫時移除限制，確保完整捕獲
-      const originalOverflow = element.style.overflow;
-      const originalWidth = element.style.width;
-      const originalMinWidth = element.style.minWidth;
-      const originalMaxHeight = element.style.maxHeight;
-      const originalHeight = element.style.height;
-      element.style.overflow = 'visible';
-      element.style.width = 'max-content';
-      element.style.minWidth = '350px';
-      element.style.maxHeight = 'none';
-      element.style.height = 'auto';
-      
-      // 等待重新渲染
-      await new Promise(resolve => setTimeout(resolve, 150));
-      
-      // 取得實際尺寸
-      const actualWidth = Math.max(element.scrollWidth, 350);
-      const actualHeight = element.scrollHeight;
-      
-      // 使用 html2canvas 將元素轉換為 canvas
+      // 使用 html2canvas 將元素轉換為 canvas（不修改樣式，保持 grid 佈局）
       const canvas = await html2canvas(element, {
         backgroundColor: '#ffffff',
-        scale: 2, // 提高解析度
+        scale: 2,
         useCORS: true,
         logging: false,
         allowTaint: true,
-        foreignObjectRendering: false,
-        imageTimeout: 15000,
-        removeContainer: true,
-        // 確保完整區域都被捕獲
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: actualWidth + 100,
-        windowHeight: actualHeight + 100,
-        width: actualWidth + 48,
-        height: actualHeight + 48,
-        x: -24,
-        y: -24,
       });
-      
-      // 還原樣式
-      element.style.overflow = originalOverflow;
-      element.style.width = originalWidth;
-      element.style.minWidth = originalMinWidth;
-      element.style.maxHeight = originalMaxHeight;
-      element.style.height = originalHeight;
       
       // 使用 data URL
       const dataUrl = canvas.toDataURL('image/png', 1.0);
@@ -1168,9 +1130,9 @@ const App = () => {
                       const displayStatus = isLeave ? status : '';
                       const hasStatus = isLeave && displayStatus;
                       return (
-                        <div key={d} className={`aspect-square rounded flex flex-col items-center border ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
-                          <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-black mt-0.5 ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
-                          {hasStatus && <span className={`${isPWA ? 'text-[9px]' : 'text-sm'} font-bold ${config.text}`}>{displayStatus}</span>}
+                        <div key={d} className={`aspect-square rounded flex flex-col items-center border overflow-hidden ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
+                          <span className={`${isPWA ? 'text-lg' : 'text-xl'} font-black mt-0.5 ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
+                          {hasStatus && <span className={`${isPWA ? 'text-[9px]' : 'text-xs'} font-bold ${config.text}`}>{displayStatus}</span>}
                         </div>
                       );
                     }
@@ -1178,9 +1140,9 @@ const App = () => {
                     // 其他倉：顯示所有非「上班」和非空白的狀態
                     const displayStatus = isLeave ? status : '';
                     return (
-                      <div key={d} className={`aspect-square rounded flex flex-col items-center border ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
-                        <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-black mt-0.5 ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
-                        {displayStatus && <span className={`${isPWA ? 'text-[9px]' : 'text-sm'} font-bold ${isInLeaveMap ? config.text : 'text-slate-600'}`}>{displayStatus}</span>}
+                      <div key={d} className={`aspect-square rounded flex flex-col items-center border overflow-hidden ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
+                        <span className={`${isPWA ? 'text-lg' : 'text-xl'} font-black mt-0.5 ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
+                        {displayStatus && <span className={`${isPWA ? 'text-[9px]' : 'text-xs'} font-bold ${isInLeaveMap ? config.text : 'text-slate-600'}`}>{displayStatus}</span>}
                       </div>
                     );
                   })}
