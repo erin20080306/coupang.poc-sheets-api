@@ -1151,8 +1151,8 @@ const App = () => {
                   ))}
                   {/* 上個月跨月日期 */}
                   {prevMonthDates.map((d) => (
-                    <div key={`prev-${d}`} className="min-h-[3rem] rounded flex flex-col items-center pt-1 border border-slate-50 bg-slate-50/50 overflow-hidden">
-                      <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-slate-300`}>{d}</span>
+                    <div key={`prev-${d}`} className="aspect-square rounded flex flex-col items-center pt-0.5 border border-slate-50 bg-slate-50/50 overflow-hidden">
+                      <span className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-slate-300`}>{d}</span>
                     </div>
                   ))}
                   {/* 當月日期 */}
@@ -1169,9 +1169,9 @@ const App = () => {
                       const displayStatus = isLeave ? status : '';
                       const hasStatus = isLeave && displayStatus;
                       return (
-                        <div key={d} className={`min-h-[3rem] rounded flex flex-col items-center pt-1 border overflow-hidden ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
-                          <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
-                          {hasStatus && <span className={`${isMobile ? 'text-[11px]' : 'text-sm'} font-bold ${config.text}`}>{displayStatus}</span>}
+                        <div key={d} className={`aspect-square rounded flex flex-col items-center pt-0.5 border overflow-hidden ${hasStatus ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
+                          <span className={`${isMobile ? 'text-lg' : 'text-xl'} font-black ${hasStatus ? config.text : 'text-slate-950'}`}>{d}</span>
+                          {hasStatus && <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-bold ${config.text}`}>{displayStatus}</span>}
                         </div>
                       );
                     }
@@ -1179,16 +1179,16 @@ const App = () => {
                     // 其他倉：顯示所有非「上班」和非空白的狀態
                     const displayStatus = isLeave ? status : '';
                     return (
-                      <div key={d} className={`min-h-[3rem] rounded flex flex-col items-center pt-1 border overflow-hidden ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
-                        <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
-                        {displayStatus && <span className={`${isMobile ? 'text-[11px]' : 'text-sm'} font-bold ${isInLeaveMap ? config.text : 'text-slate-600'}`}>{displayStatus}</span>}
+                      <div key={d} className={`aspect-square rounded flex flex-col items-center pt-0.5 border overflow-hidden ${isInLeaveMap ? `${config.border} ${config.bg}` : 'border-slate-100 bg-white'}`}>
+                        <span className={`${isMobile ? 'text-lg' : 'text-xl'} font-black ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
+                        {displayStatus && <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-bold ${isInLeaveMap ? config.text : 'text-slate-600'}`}>{displayStatus}</span>}
                       </div>
                     );
                   })}
                   {/* 下個月跨月日期 */}
                   {nextMonthDates.map((d) => (
-                    <div key={`next-${d}`} className="min-h-[3rem] rounded flex flex-col items-center pt-1 border border-slate-50 bg-slate-50/50 overflow-hidden">
-                      <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-slate-300`}>{d}</span>
+                    <div key={`next-${d}`} className="aspect-square rounded flex flex-col items-center pt-0.5 border border-slate-50 bg-slate-50/50 overflow-hidden">
+                      <span className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-slate-300`}>{d}</span>
                     </div>
                   ))}
                 </div>
@@ -1374,8 +1374,8 @@ const App = () => {
                 ))}
                 {/* 上個月跨月日期 */}
                 {prevMonthDates.map((d) => (
-                  <div key={`prev-log-${d}`} className="min-h-[3rem] rounded flex flex-col items-center pt-1 border border-slate-50 bg-slate-50/50 overflow-hidden">
-                    <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-slate-300`}>{d}</span>
+                  <div key={`prev-log-${d}`} className="aspect-square rounded flex flex-col items-center pt-0.5 border border-slate-50 bg-slate-50/50 overflow-hidden">
+                    <span className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-slate-300`}>{d}</span>
                   </div>
                 ))}
                 {/* 當月日期 */}
@@ -1388,16 +1388,16 @@ const App = () => {
                   const config = COLOR_CONFIG[status] || (isLeave ? COLOR_CONFIG["事"] : COLOR_CONFIG["上班"]);
                   const displayStatus = isLeave ? status : '';
                   return (
-                    <div key={d} className={`min-h-[3rem] rounded flex flex-col items-center pt-1 border overflow-hidden ${isInLeaveMap ? `${config.bg} ${config.border}` : 'bg-white border-slate-100'}`}>
-                      <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-black ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
-                      {displayStatus && <span className={`${isMobile ? 'text-[11px]' : 'text-sm'} font-bold ${isInLeaveMap ? config.text : 'text-slate-500'}`}>{status}</span>}
+                    <div key={d} className={`aspect-square rounded flex flex-col items-center pt-0.5 border overflow-hidden ${isInLeaveMap ? `${config.bg} ${config.border}` : 'bg-white border-slate-100'}`}>
+                      <span className={`${isMobile ? 'text-lg' : 'text-xl'} font-black ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
+                      {displayStatus && <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-bold ${isInLeaveMap ? config.text : 'text-slate-500'}`}>{status}</span>}
                     </div>
                   );
                 })}
                 {/* 下個月跨月日期 */}
                 {nextMonthDates.map((d) => (
-                  <div key={`next-log-${d}`} className="min-h-[3rem] rounded flex flex-col items-center pt-1 border border-slate-50 bg-slate-50/50 overflow-hidden">
-                    <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-slate-300`}>{d}</span>
+                  <div key={`next-log-${d}`} className="aspect-square rounded flex flex-col items-center pt-0.5 border border-slate-50 bg-slate-50/50 overflow-hidden">
+                    <span className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-slate-300`}>{d}</span>
                   </div>
                 ))}
                 </div>
@@ -1482,7 +1482,7 @@ const App = () => {
                   ))}
                   {/* 上個月跨月日期 */}
                   {prevMonthDates.map((d) => (
-                    <div key={`att-prev-${d}`} className="min-h-[3rem] rounded flex flex-col items-center pt-1 border border-slate-50 bg-slate-50/50 overflow-hidden">
+                    <div key={`att-prev-${d}`} className="aspect-square rounded flex flex-col items-center pt-0.5 border border-slate-50 bg-slate-50/50 overflow-hidden">
                       <span className={`${isMobile ? 'text-sm' : 'text-xl'} font-bold text-slate-300`}>{d}</span>
                     </div>
                   ))}
@@ -1492,7 +1492,7 @@ const App = () => {
                     const hasData = att.work !== null || att.overtime !== null || (att.note && att.note.includes('國出'));
                     const isNationalLeave = att.note && att.note.includes('國出');
                     return (
-                      <div key={`att-${d}`} className={`min-h-[3rem] rounded flex flex-col items-center pt-1 border overflow-hidden ${isNationalLeave ? 'border-purple-200 bg-purple-50' : hasData ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white'}`}>
+                      <div key={`att-${d}`} className={`aspect-square rounded flex flex-col items-center pt-0.5 border overflow-hidden ${isNationalLeave ? 'border-purple-200 bg-purple-50' : hasData ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white'}`}>
                         <span className={`${isMobile ? 'text-sm' : 'text-xl'} font-black ${isNationalLeave ? 'text-purple-700' : hasData ? 'text-blue-700' : 'text-slate-950'}`}>{d}</span>
                         {hasData && (
                           <div className={`${isMobile ? 'text-[10px]' : 'text-sm'} font-bold leading-tight text-center`}>
@@ -1507,7 +1507,7 @@ const App = () => {
                   })}
                   {/* 下個月跨月日期 */}
                   {nextMonthDates.map((d) => (
-                    <div key={`att-next-${d}`} className="min-h-[3rem] rounded flex flex-col items-center pt-1 border border-slate-50 bg-slate-50/50 overflow-hidden">
+                    <div key={`att-next-${d}`} className="aspect-square rounded flex flex-col items-center pt-0.5 border border-slate-50 bg-slate-50/50 overflow-hidden">
                       <span className={`${isMobile ? 'text-sm' : 'text-xl'} font-bold text-slate-300`}>{d}</span>
                     </div>
                   ))}
