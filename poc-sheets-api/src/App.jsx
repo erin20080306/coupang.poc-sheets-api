@@ -1237,9 +1237,8 @@ const App = () => {
                     if (hasData) {
                       return (
                         <div key={`next-${d}`} className={`aspect-square rounded-xl flex flex-col items-center justify-center border transition-all ${isLeave ? `${config.bg} ${config.border} shadow-md` : 'bg-white border-slate-100'}`}>
-                          <span className="text-[10px] font-bold text-slate-400">{nextMonth}月</span>
-                          <span className={`${isMobile ? 'text-xl' : 'text-4xl'} font-black leading-none ${isLeave ? config.text : 'text-slate-950'}`}>{d}</span>
-                          {displayStatus && <span className={`${isMobile ? 'text-[10px]' : 'text-sm'} font-bold ${config.text}`}>{displayStatus}</span>}
+                          <span className={`${isMobile ? 'text-xl' : 'text-5xl'} font-black leading-none ${isLeave ? config.text : 'text-slate-950'}`}>{d}</span>
+                          {displayStatus && <span className={`${isMobile ? 'text-[10px]' : 'text-base'} font-bold ${isMobile ? 'mt-0.5' : 'mt-1'} ${config.text}`}>{displayStatus}</span>}
                         </div>
                       );
                     }
