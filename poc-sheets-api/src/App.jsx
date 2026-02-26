@@ -1448,9 +1448,9 @@ const App = () => {
                   const config = COLOR_CONFIG[status] || (isLeave ? COLOR_CONFIG["事"] : COLOR_CONFIG["上班"]);
                   const displayStatus = isLeave ? status : '';
                   return (
-                    <div key={d} className={`aspect-square rounded-xl flex flex-col items-center justify-center border transition-all ${isInLeaveMap ? `${config.bg} ${config.border} shadow-md` : 'bg-white border-slate-100'}`}>
-                      <span className={`${isMobile ? 'text-xl' : 'text-5xl'} font-black leading-none ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
-                      {displayStatus && <span className={`${isMobile ? 'text-[10px]' : 'text-base'} font-bold ${isMobile ? 'mt-0.5' : 'mt-1'} ${isInLeaveMap ? config.text : 'text-slate-500'}`}>{status}</span>}
+                    <div key={d} className={`aspect-square rounded-xl flex flex-col items-center ${isMobile ? 'justify-center' : 'justify-start pt-2'} border transition-all ${isInLeaveMap ? `${config.bg} ${config.border} shadow-md` : 'bg-white border-slate-100'}`}>
+                      <span className={`${isMobile ? 'text-xl' : 'text-4xl'} font-black leading-none ${isInLeaveMap ? config.text : 'text-slate-950'}`}>{d}</span>
+                      {displayStatus && <span className={`${isMobile ? 'text-[10px]' : 'text-lg'} font-bold ${isMobile ? 'mt-0.5' : 'mt-0.5'} ${isInLeaveMap ? config.text : 'text-slate-500'}`}>{status}</span>}
                     </div>
                   );
                 })}
