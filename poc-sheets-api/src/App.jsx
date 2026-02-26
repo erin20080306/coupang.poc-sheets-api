@@ -590,25 +590,26 @@ const App = () => {
   };
 
   // 查詢指定月份的班表狀態（用於下個月跨月日期）
+  // 返回 { hasColumn: boolean, value: string | null }
   const getDailyStatusForMonth = (name, day, month, yr) => {
     const data = sheetData.schedule;
-    if (!data?.rows?.length || !data?.headers?.length) return null;
-
-    const userRow = data.rows.find(row => getRowName(row) === name);
-    if (!userRow) return null;
+    if (!data?.rows?.length || !data?.headers?.length) return { hasColumn: false, value: null };
 
     const monthStr = String(month).padStart(2, '0');
     const dayStr = String(day).padStart(2, '0');
     const targetDate = `${yr}-${monthStr}-${dayStr}`;
 
     const colIndex = Array.isArray(data.headersISO) ? data.headersISO.findIndex(iso => iso === targetDate) : -1;
-    if (colIndex >= 0 && data.headers[colIndex]) {
-      const header = data.headers[colIndex];
-      const value = String(userRow[header] || '').trim();
-      if (value) return value;
+    if (colIndex < 0 || !data.headers[colIndex]) {
+      return { hasColumn: false, value: null };
     }
 
-    return null;
+    const userRow = data.rows.find(row => getRowName(row) === name);
+    if (!userRow) return { hasColumn: true, value: null };
+
+    const header = data.headers[colIndex];
+    const value = String(userRow[header] || '').trim();
+    return { hasColumn: true, value: value || null };
   };
 
   // 獲取每日工時數據（從出勤時數分頁）
@@ -1224,17 +1225,19 @@ const App = () => {
                       </div>
                     );
                   })}
-                  {/* 下個月跨月日期 - 優先顯示 Google Sheet 資料 + 月份標示 */}
+                  {/* 下個月跨月日期 - Google Sheet 有欄位就顯示正常大小 */}
                   {nextMonthDates.map((d) => {
                     const nextYear = nextMonth === 1 ? year + 1 : year;
-                    const status = getDailyStatusForMonth(user.name, d, nextMonth, nextYear);
-                    const hasData = status !== null;
+                    const result = getDailyStatusForMonth(user.name, d, nextMonth, nextYear);
+                    const hasColumn = result.hasColumn;
+                    const status = result.value;
                     const trimmedStatus = String(status || '').trim();
-                    const isLeave = hasData && trimmedStatus && trimmedStatus !== '上班';
-                    const config = hasData ? (COLOR_CONFIG[status] || (isLeave ? COLOR_CONFIG["事"] : COLOR_CONFIG["上班"])) : null;
+                    const isLeave = trimmedStatus && trimmedStatus !== '上班';
+                    const config = isLeave ? (COLOR_CONFIG[status] || COLOR_CONFIG["事"]) : COLOR_CONFIG["上班"];
                     const displayStatus = isLeave ? status : '';
                     
-                    if (hasData) {
+                    // Google Sheet 有該日期欄位：顯示正常大小
+                    if (hasColumn) {
                       return (
                         <div key={`next-${d}`} className={`aspect-square rounded-xl flex flex-col items-center justify-center border transition-all ${isLeave ? `${config.bg} ${config.border} shadow-md` : 'bg-white border-slate-100'}`}>
                           <span className={`${isMobile ? 'text-xl' : 'text-5xl'} font-black leading-none ${isLeave ? config.text : 'text-slate-950'}`}>{d}</span>
@@ -1242,6 +1245,7 @@ const App = () => {
                         </div>
                       );
                     }
+                    // Google Sheet 沒有該日期欄位：顯示縮小 + 月份標示
                     return (
                       <div key={`next-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm">
                         <span className="text-[10px] font-bold text-slate-300">{nextMonth}月</span>
