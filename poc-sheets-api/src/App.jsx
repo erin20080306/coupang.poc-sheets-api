@@ -938,17 +938,19 @@ const App = () => {
     const totalCells = firstDayOfWeek + daysInMonth;
     const nextMonthDates = Array.from({ length: (7 - (totalCells % 7)) % 7 }, (_, i) => i + 1);
 
-    // 檢查當月是否有班表資料（Google Sheet 中是否有當月的日期欄位）
+    // 檢查當月是否有足夠的班表資料（Google Sheet 中當月日期欄位 >= 15 天才算有資料）
     const hasCurrentMonthScheduleData = (() => {
       const data = sheetData.schedule;
       if (!data?.headersISO?.length) return false;
       const monthStr = String(selectedMonth).padStart(2, '0');
-      // 檢查是否有任何當月的日期欄位
-      return data.headersISO.some(iso => {
+      // 計算當月日期欄位數量
+      const count = data.headersISO.filter(iso => {
         if (!iso) return false;
         const match = iso.match(/^\d{4}-(\d{2})-\d{2}$/);
         return match && match[1] === monthStr;
-      });
+      }).length;
+      // 至少 15 天才算有當月資料（跨月通常只有幾天）
+      return count >= 15;
     })();
 
     // 假別統計（TAO1 用出勤記錄，其他倉用班表）
