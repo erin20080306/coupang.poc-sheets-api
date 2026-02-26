@@ -589,6 +589,28 @@ const App = () => {
     return getDailyStatus(name, day);
   };
 
+  // 查詢指定月份的班表狀態（用於跨月日期）
+  const getDailyStatusForMonth = (name, day, month, yr) => {
+    const data = sheetData.schedule;
+    if (!data?.rows?.length || !data?.headers?.length) return null;
+
+    const userRow = data.rows.find(row => getRowName(row) === name);
+    if (!userRow) return null;
+
+    const monthStr = String(month).padStart(2, '0');
+    const dayStr = String(day).padStart(2, '0');
+    const targetDate = `${yr}-${monthStr}-${dayStr}`;
+
+    const colIndex = Array.isArray(data.headersISO) ? data.headersISO.findIndex(iso => iso === targetDate) : -1;
+    if (colIndex >= 0 && data.headers[colIndex]) {
+      const header = data.headers[colIndex];
+      const value = String(userRow[header] || '').trim();
+      if (value) return value;
+    }
+
+    return null;
+  };
+
   // 獲取每日工時數據（從出勤時數分頁）
   // 直接遍歷 row 的所有 key 來找到日期、工時、加班欄位
   const getDailyAttendance = (name, day) => {
@@ -1150,12 +1172,30 @@ const App = () => {
                   {['日','一','二','三','四','五','六'].map(w => (
                     <div key={w} className={`text-center ${isMobile ? 'text-xs' : 'text-base'} font-bold text-slate-400 py-1`}>{w}</div>
                   ))}
-                  {/* 上個月跨月日期 */}
-                  {prevMonthDates.map((d) => (
-                    <div key={`prev-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm">
-                      <span className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold leading-none text-slate-300`}>{d}</span>
-                    </div>
-                  ))}
+                  {/* 上個月跨月日期 - 優先顯示 Google Sheet 資料 */}
+                  {prevMonthDates.map((d) => {
+                    const prevYear = prevMonth === 12 ? year - 1 : year;
+                    const status = getDailyStatusForMonth(user.name, d, prevMonth, prevYear);
+                    const hasData = status !== null;
+                    const trimmedStatus = String(status || '').trim();
+                    const isLeave = hasData && trimmedStatus && trimmedStatus !== '上班';
+                    const config = hasData ? (COLOR_CONFIG[status] || (isLeave ? COLOR_CONFIG["事"] : COLOR_CONFIG["上班"])) : null;
+                    const displayStatus = isLeave ? status : '';
+                    
+                    if (hasData) {
+                      return (
+                        <div key={`prev-${d}`} className={`aspect-square rounded-xl flex flex-col items-center justify-center border transition-all ${isLeave ? `${config.bg} ${config.border} shadow-md` : 'bg-white border-slate-100'}`}>
+                          <span className={`${isMobile ? 'text-xl' : 'text-5xl'} font-black leading-none ${isLeave ? config.text : 'text-slate-950'}`}>{d}</span>
+                          {displayStatus && <span className={`${isMobile ? 'text-[10px]' : 'text-base'} font-bold ${isMobile ? 'mt-0.5' : 'mt-1'} ${config.text}`}>{displayStatus}</span>}
+                        </div>
+                      );
+                    }
+                    return (
+                      <div key={`prev-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm">
+                        <span className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold leading-none text-slate-300`}>{d}</span>
+                      </div>
+                    );
+                  })}
                   {/* 當月日期 */}
                   {daysArray.map((d) => {
                     const status = getDailyStatus(user.name, d);
@@ -1186,12 +1226,30 @@ const App = () => {
                       </div>
                     );
                   })}
-                  {/* 下個月跨月日期 */}
-                  {nextMonthDates.map((d) => (
-                    <div key={`next-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm">
-                      <span className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold leading-none text-slate-300`}>{d}</span>
-                    </div>
-                  ))}
+                  {/* 下個月跨月日期 - 優先顯示 Google Sheet 資料 */}
+                  {nextMonthDates.map((d) => {
+                    const nextYear = nextMonth === 1 ? year + 1 : year;
+                    const status = getDailyStatusForMonth(user.name, d, nextMonth, nextYear);
+                    const hasData = status !== null;
+                    const trimmedStatus = String(status || '').trim();
+                    const isLeave = hasData && trimmedStatus && trimmedStatus !== '上班';
+                    const config = hasData ? (COLOR_CONFIG[status] || (isLeave ? COLOR_CONFIG["事"] : COLOR_CONFIG["上班"])) : null;
+                    const displayStatus = isLeave ? status : '';
+                    
+                    if (hasData) {
+                      return (
+                        <div key={`next-${d}`} className={`aspect-square rounded-xl flex flex-col items-center justify-center border transition-all ${isLeave ? `${config.bg} ${config.border} shadow-md` : 'bg-white border-slate-100'}`}>
+                          <span className={`${isMobile ? 'text-xl' : 'text-5xl'} font-black leading-none ${isLeave ? config.text : 'text-slate-950'}`}>{d}</span>
+                          {displayStatus && <span className={`${isMobile ? 'text-[10px]' : 'text-base'} font-bold ${isMobile ? 'mt-0.5' : 'mt-1'} ${config.text}`}>{displayStatus}</span>}
+                        </div>
+                      );
+                    }
+                    return (
+                      <div key={`next-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm">
+                        <span className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold leading-none text-slate-300`}>{d}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </section>
