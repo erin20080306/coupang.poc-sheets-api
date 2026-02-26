@@ -589,7 +589,7 @@ const App = () => {
     return getDailyStatus(name, day);
   };
 
-  // 查詢指定月份的班表狀態（用於跨月日期）
+  // 查詢指定月份的班表狀態（用於下個月跨月日期）
   const getDailyStatusForMonth = (name, day, month, yr) => {
     const data = sheetData.schedule;
     if (!data?.rows?.length || !data?.headers?.length) return null;
@@ -938,6 +938,19 @@ const App = () => {
     const totalCells = firstDayOfWeek + daysInMonth;
     const nextMonthDates = Array.from({ length: (7 - (totalCells % 7)) % 7 }, (_, i) => i + 1);
 
+    // 檢查當月是否有班表資料（Google Sheet 中是否有當月的日期欄位）
+    const hasCurrentMonthScheduleData = (() => {
+      const data = sheetData.schedule;
+      if (!data?.headersISO?.length) return false;
+      const monthStr = String(selectedMonth).padStart(2, '0');
+      // 檢查是否有任何當月的日期欄位
+      return data.headersISO.some(iso => {
+        if (!iso) return false;
+        const match = iso.match(/^\d{4}-(\d{2})-\d{2}$/);
+        return match && match[1] === monthStr;
+      });
+    })();
+
     // 假別統計（TAO1 用出勤記錄，其他倉用班表）
     // 排除：未/調倉/離/轉正/調任/休/休假/休假日/例/例假/例假日/上班/空白
     const leaveMap = {};
@@ -1141,12 +1154,12 @@ const App = () => {
               </div>
             </section>
           )}
-          {activeTab === 'calendar' && !loading && sheetData.schedule.rows.length === 0 && (
+          {activeTab === 'calendar' && !loading && !hasCurrentMonthScheduleData && (
             <div className="bg-slate-100 border border-slate-200 rounded-2xl p-8 text-center">
               <p className="text-slate-500 font-bold text-lg">📅 {selectedMonth}月本月系統無資料或已刪除</p>
             </div>
           )}
-          {activeTab === 'calendar' && !loading && sheetData.schedule.rows.length > 0 && (
+          {activeTab === 'calendar' && !loading && hasCurrentMonthScheduleData && (
             <section className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 overflow-hidden">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -1172,30 +1185,13 @@ const App = () => {
                   {['日','一','二','三','四','五','六'].map(w => (
                     <div key={w} className={`text-center ${isMobile ? 'text-xs' : 'text-base'} font-bold text-slate-400 py-1`}>{w}</div>
                   ))}
-                  {/* 上個月跨月日期 - 優先顯示 Google Sheet 資料 */}
-                  {prevMonthDates.map((d) => {
-                    const prevYear = prevMonth === 12 ? year - 1 : year;
-                    const status = getDailyStatusForMonth(user.name, d, prevMonth, prevYear);
-                    const hasData = status !== null;
-                    const trimmedStatus = String(status || '').trim();
-                    const isLeave = hasData && trimmedStatus && trimmedStatus !== '上班';
-                    const config = hasData ? (COLOR_CONFIG[status] || (isLeave ? COLOR_CONFIG["事"] : COLOR_CONFIG["上班"])) : null;
-                    const displayStatus = isLeave ? status : '';
-                    
-                    if (hasData) {
-                      return (
-                        <div key={`prev-${d}`} className={`aspect-square rounded-xl flex flex-col items-center justify-center border transition-all ${isLeave ? `${config.bg} ${config.border} shadow-md` : 'bg-white border-slate-100'}`}>
-                          <span className={`${isMobile ? 'text-xl' : 'text-5xl'} font-black leading-none ${isLeave ? config.text : 'text-slate-950'}`}>{d}</span>
-                          {displayStatus && <span className={`${isMobile ? 'text-[10px]' : 'text-base'} font-bold ${isMobile ? 'mt-0.5' : 'mt-1'} ${config.text}`}>{displayStatus}</span>}
-                        </div>
-                      );
-                    }
-                    return (
-                      <div key={`prev-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm">
-                        <span className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold leading-none text-slate-300`}>{d}</span>
-                      </div>
-                    );
-                  })}
+                  {/* 上個月跨月日期 - 顯示月份標示 */}
+                  {prevMonthDates.map((d) => (
+                    <div key={`prev-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm">
+                      <span className="text-[10px] font-bold text-slate-300">{prevMonth}月</span>
+                      <span className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold leading-none text-slate-300`}>{d}</span>
+                    </div>
+                  ))}
                   {/* 當月日期 */}
                   {daysArray.map((d) => {
                     const status = getDailyStatus(user.name, d);
@@ -1226,7 +1222,7 @@ const App = () => {
                       </div>
                     );
                   })}
-                  {/* 下個月跨月日期 - 優先顯示 Google Sheet 資料 */}
+                  {/* 下個月跨月日期 - 優先顯示 Google Sheet 資料 + 月份標示 */}
                   {nextMonthDates.map((d) => {
                     const nextYear = nextMonth === 1 ? year + 1 : year;
                     const status = getDailyStatusForMonth(user.name, d, nextMonth, nextYear);
@@ -1239,13 +1235,15 @@ const App = () => {
                     if (hasData) {
                       return (
                         <div key={`next-${d}`} className={`aspect-square rounded-xl flex flex-col items-center justify-center border transition-all ${isLeave ? `${config.bg} ${config.border} shadow-md` : 'bg-white border-slate-100'}`}>
-                          <span className={`${isMobile ? 'text-xl' : 'text-5xl'} font-black leading-none ${isLeave ? config.text : 'text-slate-950'}`}>{d}</span>
-                          {displayStatus && <span className={`${isMobile ? 'text-[10px]' : 'text-base'} font-bold ${isMobile ? 'mt-0.5' : 'mt-1'} ${config.text}`}>{displayStatus}</span>}
+                          <span className="text-[10px] font-bold text-slate-400">{nextMonth}月</span>
+                          <span className={`${isMobile ? 'text-xl' : 'text-4xl'} font-black leading-none ${isLeave ? config.text : 'text-slate-950'}`}>{d}</span>
+                          {displayStatus && <span className={`${isMobile ? 'text-[10px]' : 'text-sm'} font-bold ${config.text}`}>{displayStatus}</span>}
                         </div>
                       );
                     }
                     return (
                       <div key={`next-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm">
+                        <span className="text-[10px] font-bold text-slate-300">{nextMonth}月</span>
                         <span className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold leading-none text-slate-300`}>{d}</span>
                       </div>
                     );
