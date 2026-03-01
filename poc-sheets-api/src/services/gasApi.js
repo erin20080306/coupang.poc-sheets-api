@@ -190,8 +190,25 @@ export async function getWarehouseSheetId(warehouse) {
  * PoC 版本：呼叫原本的 Apps Script API 取得分頁名稱
  */
 export async function getSheetNames(warehouse) {
+  const wh = String(warehouse || 'TAO1').toUpperCase();
+  const startTime = performance.now();
+
+  // 優先使用快速的 Vercel API
   try {
-    const wh = String(warehouse || 'TAO1').toUpperCase();
+    const url = `${API_BASE}/names?warehouse=${wh}&t=${Date.now()}`;
+    const response = await fetch(url, { method: 'GET', cache: 'no-store' });
+    const data = await response.json();
+    const elapsed = Math.round(performance.now() - startTime);
+    if (data.ok && Array.isArray(data.sheetNames)) {
+      console.log(`📋 getSheetNames (Vercel): ${wh} - ${elapsed}ms, ${data.sheetNames.length} sheets`);
+      return data.sheetNames;
+    }
+  } catch (e) {
+    console.warn('getSheetNames Vercel fallback to GAS:', e.message);
+  }
+
+  // Fallback: 使用 GAS API
+  try {
     const url = new URL(GAS_API_URL);
     url.searchParams.set('mode', 'getSheets');
     url.searchParams.set('wh', wh);
@@ -204,6 +221,7 @@ export async function getSheetNames(warehouse) {
     });
     
     const text = await response.text();
+    const elapsed = Math.round(performance.now() - startTime);
     let result;
     try {
       result = JSON.parse(text);
@@ -213,9 +231,11 @@ export async function getSheetNames(warehouse) {
     }
     
     if (Array.isArray(result)) {
+      console.log(`📋 getSheetNames (GAS): ${wh} - ${elapsed}ms, ${result.length} sheets`);
       return result;
     }
     if (Array.isArray(result?.sheetNames)) {
+      console.log(`📋 getSheetNames (GAS): ${wh} - ${elapsed}ms, ${result.sheetNames.length} sheets`);
       return result.sheetNames;
     }
     
