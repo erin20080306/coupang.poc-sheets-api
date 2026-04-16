@@ -675,8 +675,8 @@ const App = () => {
         const keyStr = String(key).replace(/[\s\n\r]/g, '');
         const val = row[key];
         
-        // 匹配工時欄位：包含「工作」或「工作總」或「計薪工時」
-        if (work === null && (
+        // 匹配工時欄位：包含「工作」或「工作總」或「計薪工時」，但排除含「加班」的欄位
+        if (work === null && !keyStr.includes('加班') && (
           keyStr.includes('工作總') ||
           keyStr.includes('計薪工時') ||
           (keyStr.includes('工作') && keyStr.includes('總時數')) ||
