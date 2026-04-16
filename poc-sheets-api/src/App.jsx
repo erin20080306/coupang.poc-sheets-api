@@ -1553,14 +1553,16 @@ const App = () => {
                   {/* 當月日期 */}
                   {daysArray.map((d) => {
                     const att = getDailyAttendance(user.name, d);
-                    const hasData = att.work !== null || att.overtime !== null || (att.note && att.note.includes('國出'));
+                    const hasData = att.work !== null || att.overtime !== null || (att.note && att.note.includes('國出')) || (att.note && att.note.includes('休加'));
                     const isNationalLeave = att.note && att.note.includes('國出');
+                    const isRestOvertime = att.note && att.note.includes('休加');
                     return (
-                      <div key={`att-${d}`} className={`aspect-square rounded flex flex-col items-center border ${isNationalLeave ? 'border-purple-200 bg-purple-50' : hasData ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white'}`}>
-                        <span className={`${isMobile ? 'text-sm' : 'text-xl'} font-black mt-0.5 ${isNationalLeave ? 'text-purple-700' : hasData ? 'text-blue-700' : 'text-slate-950'}`}>{d}</span>
+                      <div key={`att-${d}`} className={`aspect-square rounded flex flex-col items-center border ${isNationalLeave ? 'border-purple-200 bg-purple-50' : isRestOvertime ? 'border-blue-300 bg-blue-100' : hasData ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white'}`}>
+                        <span className={`${isMobile ? 'text-sm' : 'text-xl'} font-black mt-0.5 ${isNationalLeave ? 'text-purple-700' : isRestOvertime ? 'text-blue-800' : hasData ? 'text-blue-700' : 'text-slate-950'}`}>{d}</span>
                         {hasData && (
                           <div className={`${isMobile ? 'text-[10px]' : 'text-sm'} font-bold leading-tight text-center`}>
                             {isNationalLeave && <div className="text-purple-600">國出</div>}
+                            {isRestOvertime && <div className="text-blue-600">休加</div>}
                             {att.work !== null && <span className="text-emerald-600">工{att.work}</span>}
                             {att.work !== null && att.overtime !== null && <span className="text-slate-400">,</span>}
                             {att.overtime !== null && <span className="text-orange-600">加{att.overtime}</span>}
