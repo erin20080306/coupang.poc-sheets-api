@@ -16,7 +16,7 @@ let lastFetchMs = 0;
 export function getLastFetchMs() { return lastFetchMs; }
 
 // 支援的倉庫列表
-const WAREHOUSES = ['TAO1', 'TAO3', 'TAO4', 'TAO5', 'TAO6', 'TAO7', 'TAO10'];
+const WAREHOUSES = ['TAO1', 'TAO3', 'TAO4', 'TAO5', 'TAO6', 'TAO7', 'TPH1', 'TAO17'];
 
 // 禁止快取
 const NO_CACHE_HEADERS = {
