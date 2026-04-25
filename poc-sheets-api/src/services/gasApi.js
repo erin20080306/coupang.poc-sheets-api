@@ -1,4 +1,4 @@
-// PoC: Google Sheets API 服務
+// PoC: Google Sheets API 服務 (v1.1)
 // 使用 Vercel Serverless API 直連 Google Sheets API（Service Account）
 // 目標：測試是否比 Apps Script 更快
 // 
@@ -254,7 +254,7 @@ function isTao3ScheduleSheet(warehouse, sheetName) {
   const wh = String(warehouse || '').toUpperCase();
   const name = String(sheetName || '').toLowerCase();
   // TAO3 的班表類分頁：包含「班表」但不包含「出勤」
-  return wh === 'TAO3' && name.includes('班表') && !name.includes('出勤');
+  return (wh === 'TAO3' || wh === 'TAO17') && name.includes('班表') && !name.includes('出勤');
 }
 
 /**
