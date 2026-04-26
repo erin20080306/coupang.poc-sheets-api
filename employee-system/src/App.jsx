@@ -530,6 +530,24 @@ const App = () => {
     return getDailyStatus(name, day);
   };
 
+  // 跨月查詢：用指定的月份查詢某日的班表/出勤狀態
+  const getDailyStatusForMonth = (data, name, targetMonth, day) => {
+    if (!data?.rows?.length || !data?.headers?.length) return "";
+    const userRow = data.rows.find(row => getRowName(row) === name);
+    if (!userRow) return "";
+    const yr = pickYearFromISO(data.headersISO);
+    const nextYr = targetMonth < selectedMonth ? yr + 1 : yr;
+    const mStr = String(targetMonth).padStart(2, '0');
+    const dStr = String(day).padStart(2, '0');
+    const targetDate = `${nextYr}-${mStr}-${dStr}`;
+    const colIndex = Array.isArray(data.headersISO) ? data.headersISO.findIndex(iso => iso === targetDate) : -1;
+    if (colIndex >= 0 && data.headers[colIndex]) {
+      const value = String(userRow[data.headers[colIndex]] || '').trim();
+      if (value) return value;
+    }
+    return "";
+  };
+
   // 處理登入 (自動辨識倉別)
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -993,12 +1011,20 @@ const App = () => {
                     );
                   })}
                   {/* 下個月跨月日期 */}
-                  {nextMonthDates.map((d) => (
-                    <div key={`next-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm" style={{aspectRatio: '1/1'}}>
-                      <span className="text-[10px] font-bold text-slate-300">{nextMonth}月</span>
-                      <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-bold leading-none text-slate-300`}>{d}</span>
-                    </div>
-                  ))}
+                  {nextMonthDates.map((d) => {
+                    const nextStatus = getDailyStatusForMonth(sheetData.schedule, user.name, nextMonth, d);
+                    const isLeaveNext = nextStatus && nextStatus !== '上班';
+                    const displayNext = isLeaveNext ? nextStatus : '';
+                    const cfgNext = COLOR_CONFIG[nextStatus] || (isLeaveNext ? COLOR_CONFIG["事"] : null);
+                    const hasStyleNext = isLeaveNext && cfgNext;
+                    return (
+                      <div key={`next-${d}`} className={`aspect-square rounded-xl flex flex-col items-center justify-center border ${hasStyleNext ? `${cfgNext.border} ${cfgNext.bg}` : 'border-slate-100 bg-slate-50/80'} shadow-sm`} style={{aspectRatio: '1/1'}}>
+                        <span className="text-[10px] font-bold text-slate-400">{nextMonth}月</span>
+                        <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-black leading-none ${hasStyleNext ? cfgNext.text : 'text-slate-400'}`}>{d}</span>
+                        {displayNext && <span className={`${isPWA ? 'text-[10px]' : 'text-xs'} font-bold ${hasStyleNext ? cfgNext.text : 'text-slate-400'}`}>{displayNext}</span>}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </section>
@@ -1172,12 +1198,20 @@ const App = () => {
                   );
                 })}
                 {/* 下個月跨月日期 */}
-                {nextMonthDates.map((d) => (
-                  <div key={`next-log-${d}`} className="aspect-square rounded-xl flex flex-col items-center justify-center border border-slate-50 bg-slate-50/50 shadow-sm">
-                    <span className="text-[10px] font-bold text-slate-300">{nextMonth}月</span>
-                    <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-bold leading-none text-slate-300`}>{d}</span>
-                  </div>
-                ))}
+                {nextMonthDates.map((d) => {
+                  const nextStatus = getDailyStatusForMonth(sheetData.records, user.name, nextMonth, d) || getDailyStatusForMonth(sheetData.schedule, user.name, nextMonth, d);
+                  const isLeaveNext = nextStatus && nextStatus !== '上班';
+                  const displayNext = isLeaveNext ? nextStatus : '';
+                  const cfgNext = COLOR_CONFIG[nextStatus] || (isLeaveNext ? COLOR_CONFIG["事"] : null);
+                  const hasStyleNext = isLeaveNext && cfgNext;
+                  return (
+                    <div key={`next-log-${d}`} className={`aspect-square rounded-xl flex flex-col items-center justify-center border ${hasStyleNext ? `${cfgNext.border} ${cfgNext.bg}` : 'border-slate-100 bg-slate-50/80'} shadow-sm`}>
+                      <span className="text-[10px] font-bold text-slate-400">{nextMonth}月</span>
+                      <span className={`${isPWA ? 'text-lg' : 'text-2xl'} font-black leading-none ${hasStyleNext ? cfgNext.text : 'text-slate-400'}`}>{d}</span>
+                      {displayNext && <span className={`${isPWA ? 'text-[10px]' : 'text-xs'} font-bold ${hasStyleNext ? cfgNext.text : 'text-slate-400'}`}>{displayNext}</span>}
+                    </div>
+                  );
+                })}
                 </div>
               </div>
             </section>
